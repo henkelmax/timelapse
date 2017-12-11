@@ -18,7 +18,7 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
     private JMenu menuOptions;
     private JMenu itemWebcam;*/
 
-    public TimelapseFrame(final TimelapseEngine timelapseEngine, final TimelapseThread timelapseThread) {
+    public TimelapseFrame(final TimelapseEngine timelapseEngine, final TimelapseThread timelapseThread, TelegramBotAPI telegramBotAPI) {
         this.timelapseEngine = timelapseEngine;
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -52,6 +52,7 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                telegramBotAPI.stop();
                 timelapseThread.stopTimelapse();
                 try {
                     timelapseThread.join(10000);//Wait max 10 seconds for thread to stop
@@ -59,6 +60,14 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
                     e1.printStackTrace();
                 }
                 timelapseEngine.close();
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+
+                System.exit(0);
             }
         });
     }

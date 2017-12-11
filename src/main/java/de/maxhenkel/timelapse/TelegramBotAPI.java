@@ -6,12 +6,12 @@ import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.Update;
+import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
 import de.maxhenkel.henkellib.config.Configuration;
 import de.maxhenkel.henkellib.logging.Log;
-import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -51,29 +51,41 @@ public class TelegramBotAPI implements UpdatesListener{
         File image=timelapseEngine.getLastImageFile();
 
         if(image==null||!image.exists()){
-            //TODO send failed
-            Log.i("Telegram: cant send image: null");
+            send(chat, "Momentan keine Bilder vorhanden");
             return;
         }
 
         Log.i("Sending image to " +chat.username());
+
+
         SendPhoto request = new SendPhoto(chat.id(), image).disableNotification(true);
 
         bot.execute(request, new Callback<SendPhoto, SendResponse>() {
             @Override
-            public void onResponse(SendPhoto request, SendResponse response) {
-                Log.i("res " +response.toString());
-            }
+            public void onResponse(SendPhoto request, SendResponse response) {}
 
             @Override
             public void onFailure(SendPhoto request, IOException e) {
-                Log.i("fail: " +e.getMessage());
-                e.printStackTrace();
+                if(Log.isDebug()){
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    public byte[] imageToBytes(BufferedImage image){
-        return ((DataBufferByte) image.getData().getDataBuffer()).getData();
+    private void send(Chat chat, String message) {
+        SendMessage request = new SendMessage(chat.id(), message).parseMode(ParseMode.HTML).disableNotification(true);
+
+        bot.execute(request, new Callback<SendMessage, SendResponse>() {
+            @Override
+            public void onResponse(SendMessage request, SendResponse response) {}
+
+            @Override
+            public void onFailure(SendMessage request, IOException e) {}
+        });
+    }
+
+    public void stop(){
+        bot.removeGetUpdatesListener();
     }
 }

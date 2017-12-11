@@ -16,13 +16,15 @@ public class Main {
 
         TimelapseThread thread=new TimelapseThread(timelapseEngine);
 
-        TimelapseFrame frame=new TimelapseFrame(timelapseEngine, thread);
+        TelegramBotAPI telegramBotAPI=new TelegramBotAPI(config, timelapseEngine);
+
+        TimelapseFrame frame=new TimelapseFrame(timelapseEngine, thread, telegramBotAPI);
         frame.setVisible(true);
 
         timelapseEngine.setTimelapseListener(frame);
 
         thread.start();
 
-        TelegramBotAPI telegramBotAPI=new TelegramBotAPI(config, timelapseEngine);
+
     }
 }
