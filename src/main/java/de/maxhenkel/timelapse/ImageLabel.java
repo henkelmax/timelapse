@@ -18,6 +18,7 @@ public class ImageLabel extends JPanel {
         setLayout(new BorderLayout());
         this.label=new JLabel("", SwingConstants.CENTER);
         label.setFont(new Font(label.getFont().getName(), Font.PLAIN, 24));
+        label.setForeground(Color.WHITE);
         add(label, BorderLayout.SOUTH);
     }
 

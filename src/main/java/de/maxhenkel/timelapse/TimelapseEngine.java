@@ -122,11 +122,14 @@ public class TimelapseEngine {
         return webcam;
     }
 
-    public void setWebcam(Webcam webcam) {
+    public void setWebcam(Webcam w) {
         if(webcam!=null){
             webcam.close();
         }
-        this.webcam = webcam;
+        this.webcam = w;
+        if(webcam==null){
+            return;
+        }
         config.putString("webcam", webcam.getName());
         setResolution(width, height);
     }
