@@ -1,5 +1,6 @@
 package de.maxhenkel.timelapse;
 
+import de.maxhenkel.henkellib.config.Configuration;
 import de.maxhenkel.henkellib.config.PropertyConfiguration;
 import java.io.IOException;
 
@@ -7,7 +8,9 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         //Log.setLogLevel(Log.LogLevel.ALL);
-        TimelapseEngine timelapseEngine=new TimelapseEngine(new PropertyConfiguration("config.properties"));
+
+        Configuration config=new PropertyConfiguration("config.properties");
+        TimelapseEngine timelapseEngine=new TimelapseEngine(config);
 
         timelapseEngine.printInfo();
 
@@ -19,5 +22,7 @@ public class Main {
         timelapseEngine.setTimelapseListener(frame);
 
         thread.start();
+
+        TelegramBotAPI telegramBotAPI=new TelegramBotAPI(config, timelapseEngine);
     }
 }

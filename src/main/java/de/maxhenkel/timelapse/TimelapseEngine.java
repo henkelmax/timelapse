@@ -28,6 +28,8 @@ public class TimelapseEngine {
     private float compression;
     private SimpleDateFormat simpleDateFormat;
     private TimelapseListener listener;
+    private BufferedImage lastImage;
+    private File lastImageFile;
 
     public TimelapseEngine(Configuration config) {
         this.config = config;
@@ -100,6 +102,14 @@ public class TimelapseEngine {
         }
     }
 
+    public BufferedImage getLastImage() {
+        return lastImage;
+    }
+
+    public File getLastImageFile() {
+        return lastImageFile;
+    }
+
     public void setCompression(float compression){
         this.compression=compression;
         config.putFloat("compression", compression);
@@ -164,6 +174,8 @@ public class TimelapseEngine {
             return;
         }
 
+        lastImage=bi;
+
         int i=0;
 
         File image;
@@ -178,6 +190,8 @@ public class TimelapseEngine {
 
         //ImageIO.write(webcam.getImage(), "png", image);
         saveImage(bi, image, compression);
+
+        lastImageFile=image;
 
         if(listener!=null){
             listener.onImage(bi, time);
