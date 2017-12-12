@@ -22,7 +22,7 @@ public class TimelapseThread extends Thread{
 
                 lastImage=System.currentTimeMillis();
 
-                Log.d("Taking picture");
+                //Log.d("Taking picture");
                 timelapseEngine.takePicture();
             }catch (Throwable e){
                 e.printStackTrace();

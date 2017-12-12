@@ -1,53 +1,36 @@
 package de.maxhenkel.timelapse;
 
+import de.maxhenkel.henkellib.config.Configuration;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 
 public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseListener {
 
-    private TimelapseEngine timelapseEngine;
     private ImageLabel imageLabel;
     private SimpleDateFormat simpleDateFormat;
 
-   /* private JMenuBar menuBar;
-    private JMenu menuOptions;
-    private JMenu itemWebcam;*/
-
-    public TimelapseFrame(final TimelapseEngine timelapseEngine, final TimelapseThread timelapseThread, TelegramBotAPI telegramBotAPI) {
-        this.timelapseEngine = timelapseEngine;
+    public TimelapseFrame(final TimelapseEngine timelapseEngine, final TimelapseThread timelapseThread, TelegramBotAPI telegramBotAPI, Configuration config) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        String sdf=config.getString("frame_date_format", "dd.MM.yyyy HH:mm:ss");
+        simpleDateFormat = new SimpleDateFormat(sdf);
 
         setTitle("Timelapse");
-        setSize(800, 450);
+        setSize(800, 470);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLayout(new BorderLayout());
 
         this.imageLabel = new ImageLabel();
         this.add(imageLabel, BorderLayout.CENTER);
-
-        /*this.menuBar=new JMenuBar();
-
-        menuOptions=new JMenu("Options");
-        itemWebcam=new JMenu("webcam");
-
-        itemWebcam.add()
-        //itemWebcam.
-        menuOptions.add(itemWebcam);
-        menuBar.add(menuOptions);
-
-        this.setJMenuBar(menuBar);*/
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -72,8 +55,8 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
         });
     }
 
-    public void onImage(BufferedImage image, Date date) {
+    public void onImage(BufferedImage image, long time) {
         imageLabel.setImage(image);
-        imageLabel.setLabel(simpleDateFormat.format(date));
+        imageLabel.setLabel(TimeFormatter.format(simpleDateFormat, time));
     }
 }

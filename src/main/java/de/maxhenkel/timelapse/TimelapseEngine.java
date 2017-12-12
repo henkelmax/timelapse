@@ -7,15 +7,12 @@ import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
-import javax.imageio.stream.FileImageOutputStream;
 import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class TimelapseEngine {
@@ -28,12 +25,14 @@ public class TimelapseEngine {
     private float compression;
     private SimpleDateFormat simpleDateFormat;
     private TimelapseListener listener;
-    private BufferedImage lastImage;
+    private byte[] lastImage;
+    private long lastImageTime;
     private File lastImageFile;
 
     public TimelapseEngine(Configuration config) {
         this.config = config;
-        this.simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+        String sdf=config.getString("file_date_format", "yyyy-MM-dd-HH-mm-ss");
+        this.simpleDateFormat=new SimpleDateFormat(sdf);
         this.width = config.getInt("image_width", 1920);
         this.height = config.getInt("image_height", 1080);
         this.compression=config.getFloat("compression", 1.0F);
@@ -102,8 +101,12 @@ public class TimelapseEngine {
         }
     }
 
-    public BufferedImage getLastImage() {
+    public byte[] getLastImage() {
         return lastImage;
+    }
+
+    public long getLastImageTime(){
+        return lastImageTime;
     }
 
     public File getLastImageFile() {
@@ -167,57 +170,67 @@ public class TimelapseEngine {
         }
 
         BufferedImage bi=webcam.getImage();
-        Date time=Calendar.getInstance().getTime();
+        long time=System.currentTimeMillis();
 
         if(bi==null){
             Log.e("Failed to capture Image");
             return;
         }
 
-        lastImage=bi;
+        lastImage=getImage(bi, compression);
+        lastImageTime=time;
 
         int i=0;
 
-        File image;
+        File imageFile;
 
         while (true){
-            image=new File(outputFolder, generateFileName(i, "jpg", time));
-            if(!image.exists()){
+            imageFile=new File(outputFolder, generateFileName(i, "jpg", time));
+            if(!imageFile.exists()){
                 break;
             }
             i++;
         }
 
-        //ImageIO.write(webcam.getImage(), "png", image);
-        saveImage(bi, image, compression);
+        save(lastImage, imageFile);
 
-        lastImageFile=image;
+        lastImageFile=imageFile;
 
         if(listener!=null){
             listener.onImage(bi, time);
         }
     }
 
-    private String generateFileNameDate(Date date) {
-        return simpleDateFormat.format(date);
+    private String generateFileName(int i, String fileEnding, long time) {
+        return TimeFormatter.format(simpleDateFormat, time) + (i <= 0 ? "" : "-" +i) + "." +fileEnding;
     }
 
-    private String generateFileName(int i, String fileEnding, Date date) {
-        return generateFileNameDate(date) + (i <= 0 ? "" : "-" +i) + "." +fileEnding;
-    }
-
-    public static void saveImage(BufferedImage image, File file, float compression) throws IOException {
+    public static byte[] getImage(BufferedImage image, float compression) throws IOException {
         ImageWriter jpgWriter = ImageIO.getImageWritersByFormatName("jpg").next();
         ImageWriteParam jpgWriteParam = jpgWriter.getDefaultWriteParam();
         jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         jpgWriteParam.setCompressionQuality(compression);
 
-        ImageOutputStream outputStream = new FileImageOutputStream(file);
+        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+        ImageOutputStream outputStream = new MemoryCacheImageOutputStream(byteArrayOutputStream);
+
         jpgWriter.setOutput(outputStream);
         IIOImage outputImage = new IIOImage(image, null, null);
         jpgWriter.write(null, outputImage, jpgWriteParam);
         jpgWriter.dispose();
         outputStream.close();
+
+        byteArrayOutputStream.flush();
+        byte[] data=byteArrayOutputStream.toByteArray();
+        byteArrayOutputStream.close();
+        return data;
+    }
+
+    public static void save(byte[] image, File file) throws IOException {
+        FileOutputStream fos=new FileOutputStream(file);
+        fos.write(image);
+        fos.flush();
+        fos.close();
     }
 
     public void close(){
@@ -227,7 +240,7 @@ public class TimelapseEngine {
     }
 
     public static interface TimelapseListener{
-        public void onImage(BufferedImage image, Date time);
+        public void onImage(BufferedImage image, long time);
     }
 
 }

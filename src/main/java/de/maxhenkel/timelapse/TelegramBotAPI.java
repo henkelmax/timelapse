@@ -12,17 +12,20 @@ import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
 import de.maxhenkel.henkellib.config.Configuration;
 import de.maxhenkel.henkellib.logging.Log;
-import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class TelegramBotAPI implements UpdatesListener{
 
     private TelegramBot bot;
     private TimelapseEngine timelapseEngine;
+    private SimpleDateFormat simpleDateFormat;
 
     public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine){
         this.timelapseEngine=timelapseEngine;
+        String sdf=config.getString("telegram_date_format", "dd.MM.yyyy HH:mm:ss");
+        simpleDateFormat = new SimpleDateFormat(sdf);
         this.bot = new TelegramBot(config.getString("api_token", "373696179:AAEiNVKQHumH5Ld6pBt1TDwVJeP7T5pPAcw"));
         bot.setUpdatesListener(this);
     }
@@ -30,7 +33,11 @@ public class TelegramBotAPI implements UpdatesListener{
     @Override
     public int process(List<Update> list) {
         for(Update u:list){
-            processUpdate(u);
+            try{
+                processUpdate(u);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         return UpdatesListener.CONFIRMED_UPDATES_ALL;
     }
@@ -42,27 +49,34 @@ public class TelegramBotAPI implements UpdatesListener{
     }
 
     public void processMessage(Message message){
+        if(message.text()==null||message.chat()==null){
+            return;
+        }
+
         if(message.text().startsWith("/image")) {
             sendImage(message.chat());
         }
     }
 
     public void sendImage(Chat chat){
-        File image=timelapseEngine.getLastImageFile();
+        byte[] image=timelapseEngine.getLastImage();
 
-        if(image==null||!image.exists()){
+        if(image==null){
             send(chat, "Momentan keine Bilder vorhanden");
             return;
         }
 
         Log.i("Sending image to " +chat.username());
 
-
         SendPhoto request = new SendPhoto(chat.id(), image).disableNotification(true);
 
         bot.execute(request, new Callback<SendPhoto, SendResponse>() {
             @Override
-            public void onResponse(SendPhoto request, SendResponse response) {}
+            public void onResponse(SendPhoto request, SendResponse response) {
+                if(timelapseEngine.getLastImageTime()>0){
+                    send(chat, "Bild vom " +TimeFormatter.format(simpleDateFormat, timelapseEngine.getLastImageTime()));
+                }
+            }
 
             @Override
             public void onFailure(SendPhoto request, IOException e) {
@@ -71,6 +85,7 @@ public class TelegramBotAPI implements UpdatesListener{
                 }
             }
         });
+
     }
 
     private void send(Chat chat, String message) {
