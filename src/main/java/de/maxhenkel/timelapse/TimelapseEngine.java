@@ -103,6 +103,10 @@ public class TimelapseEngine {
         }
     }
 
+    public File getOutputFolder() {
+        return outputFolder;
+    }
+
     public byte[] getLastImage() {
         return lastImage;
     }
