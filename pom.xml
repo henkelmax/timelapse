@@ -18,7 +18,7 @@
         <dependency>
             <groupId>de.maxhenkel.henkellib</groupId>
             <artifactId>henkellib</artifactId>
-            <version>1.0.3-20171211.115802-3</version>
+            <version>1.0.3-20171212.192834-5</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

@@ -3,6 +3,8 @@ package de.maxhenkel.timelapse;
 import com.github.sarxos.webcam.Webcam;
 import de.maxhenkel.henkellib.config.Configuration;
 import de.maxhenkel.henkellib.logging.Log;
+import de.maxhenkel.henkellib.time.TimeFormatter;
+
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;

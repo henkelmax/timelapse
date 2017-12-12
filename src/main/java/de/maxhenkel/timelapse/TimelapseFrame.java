@@ -1,6 +1,7 @@
 package de.maxhenkel.timelapse;
 
 import de.maxhenkel.henkellib.config.Configuration;
+import de.maxhenkel.henkellib.time.TimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;

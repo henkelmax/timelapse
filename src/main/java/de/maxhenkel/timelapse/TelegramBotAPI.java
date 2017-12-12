@@ -12,6 +12,8 @@ import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.SendResponse;
 import de.maxhenkel.henkellib.config.Configuration;
 import de.maxhenkel.henkellib.logging.Log;
+import de.maxhenkel.henkellib.time.TimeFormatter;
+
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -74,7 +76,7 @@ public class TelegramBotAPI implements UpdatesListener{
             @Override
             public void onResponse(SendPhoto request, SendResponse response) {
                 if(timelapseEngine.getLastImageTime()>0){
-                    send(chat, "Bild vom " +TimeFormatter.format(simpleDateFormat, timelapseEngine.getLastImageTime()));
+                    send(chat, "Bild vom " + TimeFormatter.format(simpleDateFormat, timelapseEngine.getLastImageTime()));
                 }
             }
 
