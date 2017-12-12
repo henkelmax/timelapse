@@ -26,7 +26,7 @@ public class TelegramBotAPI implements UpdatesListener{
         this.timelapseEngine=timelapseEngine;
         String sdf=config.getString("telegram_date_format", "dd.MM.yyyy HH:mm:ss");
         simpleDateFormat = new SimpleDateFormat(sdf);
-        this.bot = new TelegramBot(config.getString("api_token", "373696179:AAEiNVKQHumH5Ld6pBt1TDwVJeP7T5pPAcw"));
+        this.bot = new TelegramBot(config.getString("api_token", "--APIKEY--"));
         bot.setUpdatesListener(this);
     }
 
