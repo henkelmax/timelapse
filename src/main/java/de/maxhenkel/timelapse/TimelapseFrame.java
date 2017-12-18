@@ -32,28 +32,6 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
 
         this.imageLabel = new ImageLabel();
         this.add(imageLabel, BorderLayout.CENTER);
-
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent e) {
-                telegramBotAPI.stop();
-                timelapseThread.stopTimelapse();
-                try {
-                    timelapseThread.join(10000);//Wait max 10 seconds for thread to stop
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-                timelapseEngine.close();
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-
-                System.exit(0);
-            }
-        });
     }
 
     public void onImage(BufferedImage image, long time) {

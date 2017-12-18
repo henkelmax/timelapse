@@ -6,7 +6,7 @@
 
     <groupId>de.maxhenkel.timelapse</groupId>
     <artifactId>timelapse</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
@@ -17,7 +17,7 @@
         <dependency>
             <groupId>de.maxhenkel.henkellib</groupId>
             <artifactId>henkellib</artifactId>
-            <version>1.0.3-20171212.192834-5</version>
+            <version>1.0.4-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
