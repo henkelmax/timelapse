@@ -65,6 +65,8 @@ public class TelegramBotAPI implements UpdatesListener {
             sendImage(message.chat(), message.from());
         } else if (message.text().startsWith("/whitelist_")) {
             processWhitelist(message.text(), message.chat());
+        } else if (message.text().startsWith("/blacklist_")) {
+            processBlacklist(message.text(), message.chat());
         }
     }
 
@@ -77,7 +79,11 @@ public class TelegramBotAPI implements UpdatesListener {
             if (!chat.id().equals(adminChatID) && !database.isWhitelisted(user.id())) {
                 Log.i("User " + (user.username() == null ? String.valueOf(user.id()) : user.username()) + " is not whitelisted");
                 send(chat, "Sie haben keine Berechtigung für diesen Befehl");
-                sendAdminWhitelistRequest(chat.id(), user);
+                if(!database.isBlacklisted(user.id())){
+                    sendAdminWhitelistRequest(chat.id(), user);
+                }else{
+                    Log.d("User " + (user.username() == null ? String.valueOf(user.id()) : user.username()) + " is blacklisted");
+                }
                 return;
             }
         } catch (SQLException e) {
@@ -136,9 +142,9 @@ public class TelegramBotAPI implements UpdatesListener {
 
     private void sendAdminWhitelistRequest(long chatid, User user) {
         if (user.username() != null) {
-            send(adminChatID, "Anfrage von '" + user.username() + "' userid '" + user.id() + "' \n/whitelist_" + chatid);
+            send(adminChatID, "Anfrage von '" + user.username() + "' userid '" + user.id() + "' \n/whitelist_" + chatid + "\n/blacklist_" + user.id());
         } else {
-            send(adminChatID, "Anfrage von userid '" + user.id() + "' \n/whitelist_" + chatid);
+            send(adminChatID, "Anfrage von userid '" + user.id() + "' \n/whitelist_" + chatid + "\n/blacklist_" + user.id());
         }
     }
 
@@ -175,11 +181,55 @@ public class TelegramBotAPI implements UpdatesListener {
                     }
                 }
                 database.addToWhitelist(addID, comment);
-                send(chat, "Nutzer wurde hinzugefügt");
-                Log.i("Added user '" + addID + "' with comment '" + comment + "'");
+                send(chat, "Nutzer wurde zur whitelist hinzugefügt");
+                Log.i("Added user '" + addID + "' with comment '" + comment + "' to whitelist");
             }
         } catch (SQLException e) {
             Log.e("Failed to add user to whitelist");
+            e.printStackTrace();
+            send(chat, "Datenbankfehler");
+            return;
+        }
+    }
+
+    public void processBlacklist(String msg, Chat chat) {
+        if (!chat.id().equals(adminChatID)) {
+            send(chat, "Du bist nicht Max!");
+            return;
+        }
+
+        String[] msgSplit = msg.split(" ");
+
+        if (msgSplit.length <= 0) {
+            return;
+        }
+
+        String id = msgSplit[0].replace("/blacklist_", "");
+        int addID;
+        try {
+            addID = Integer.parseInt(id);
+        } catch (NumberFormatException e) {
+            send(chat, "Fehlerhafte formatierung");
+            return;
+        }
+
+        try {
+            if (database.isBlacklisted(addID)) {
+                send(chat, "Nutzer ist bereits auf der blacklist");
+                return;
+            } else {
+                String comment = "";
+                if (msgSplit.length >= 2) {
+                    for (int i = 1; i < msgSplit.length; i++) {
+                        comment += " " + msgSplit[i];
+                    }
+                }
+                database.addToBlacklist(addID, comment);
+                send(chat, "Nutzer wurde zur blacklist hinzugefügt");
+                Log.i("Added user '" + addID + "' with comment '" + comment + "' to blacklist");
+            }
+        } catch (SQLException e) {
+            Log.e("Failed to add user to blacklist");
             e.printStackTrace();
             send(chat, "Datenbankfehler");
             return;
