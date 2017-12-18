@@ -15,7 +15,7 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
     private ImageLabel imageLabel;
     private SimpleDateFormat simpleDateFormat;
 
-    public TimelapseFrame(final TimelapseEngine timelapseEngine, final TimelapseThread timelapseThread, TelegramBotAPI telegramBotAPI, Configuration config) {
+    public TimelapseFrame(Configuration config) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
@@ -27,7 +27,7 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
         setTitle("Timelapse");
         setSize(800, 470);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setLayout(new BorderLayout());
 
         this.imageLabel = new ImageLabel();
