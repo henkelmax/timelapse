@@ -27,6 +27,7 @@ public class TelegramBotAPI implements UpdatesListener {
     private SimpleDateFormat simpleDateFormat;
     private Database database;
     private long adminChatID;
+    private long maxMessageDelay;
 
     public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine) throws SQLException {
         this.timelapseEngine = timelapseEngine;
@@ -34,6 +35,7 @@ public class TelegramBotAPI implements UpdatesListener {
         simpleDateFormat = new SimpleDateFormat(sdf);
         database = new Database(config);
         adminChatID = config.getLong("admin_chat_id", 9181493); //@get_id_bot
+        maxMessageDelay=config.getLong("max_message_delay", 60000);
         this.bot = new TelegramBot(config.getString("api_token", "--APIKEY--"));
         bot.setUpdatesListener(this);
     }
@@ -58,6 +60,12 @@ public class TelegramBotAPI implements UpdatesListener {
 
     public void processMessage(Message message) {
         if (message.text() == null || message.chat() == null || message.from() == null) {
+            return;
+        }
+
+        long date=message.date()*1000L;
+        if((System.currentTimeMillis()-date)>maxMessageDelay){
+            Log.d("Ignoring late messages");
             return;
         }
 
