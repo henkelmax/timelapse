@@ -6,6 +6,7 @@ import de.maxhenkel.henkellib.config.PropertyConfiguration;
 import de.maxhenkel.henkellib.io.InputHandler;
 import de.maxhenkel.henkellib.io.InputStreamInputHandler;
 import de.maxhenkel.henkellib.logging.Log;
+import de.maxhenkel.timelapse.telegram.TelegramBotAPI;
 
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
