@@ -1,8 +1,6 @@
 package de.maxhenkel.timelapse.telegram;
 
 import com.pengrad.telegrambot.Callback;
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.UpdatesListener;
 import com.pengrad.telegrambot.model.*;
 import com.pengrad.telegrambot.model.request.*;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -13,74 +11,49 @@ import de.maxhenkel.henkellib.logging.Log;
 import de.maxhenkel.henkellib.time.TimeFormatter;
 import de.maxhenkel.timelapse.Database;
 import de.maxhenkel.timelapse.TimelapseEngine;
-import org.json.JSONException;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
-import java.util.List;
 
-public class TelegramBotAPI implements UpdatesListener {
+public class TelegramBotAPI  extends TelegramBotBase{
 
-    private TelegramBot bot;
     private TimelapseEngine timelapseEngine;
     private SimpleDateFormat simpleDateFormat;
     private Database database;
-    private long adminChatID;
+    private int adminUserID;
     private long maxMessageDelay;
 
     public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine) throws SQLException {
+        super(config.getString("api_token", ""));
         this.timelapseEngine = timelapseEngine;
         String sdf = config.getString("telegram_date_format", "dd.MM.yyyy HH:mm:ss");
         simpleDateFormat = new SimpleDateFormat(sdf);
         database = new Database(config);
-        adminChatID = config.getLong("admin_chat_id", 9181493); //@get_id_bot
+        adminUserID = config.getInt("admin_user_id", 9181493);
         maxMessageDelay = config.getLong("max_message_delay", 60000);
-        this.bot = new TelegramBot(config.getString("api_token", "--APIKEY--"));
-        bot.setUpdatesListener(this);
     }
 
     @Override
-    public int process(List<Update> list) {
-        for (Update u : list) {
-            try {
-                processUpdate(u);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        return UpdatesListener.CONFIRMED_UPDATES_ALL;
-    }
-
-    public void processUpdate(Update update) {
-        if (update.callbackQuery() != null) {
-            processCallback(update.callbackQuery());
-        } else if (update.message() != null) {
-            processMessage(update.message());
-        }
-    }
-
-    public void processMessage(Message message) {
-        if (message.text() == null || message.chat() == null || message.from() == null) {
-            return;
-        }
-
-        long date = message.date() * 1000L;
-        if ((System.currentTimeMillis() - date) > maxMessageDelay) {
+    protected void onCommand(String command, Message message) {
+        if ((System.currentTimeMillis() - (message.date() * 1000L)) > maxMessageDelay) {
             Log.d("Ignoring late messages");
             return;
         }
 
-        if (message.text().startsWith("/image")) {
-            sendImage(message.chat(), message.from());
+        if (command.equalsIgnoreCase("/image")||command.equalsIgnoreCase("/bild")) {
+            sendImage(message);
+        }else if(command.equalsIgnoreCase("/id")){
+            send(message.chat().id(), "Ihre User ID ist '" +message.from().id() +"'");
         }
     }
 
-    public void processCallback(CallbackQuery callbackQuery) {
+    @Override
+    protected void onCallbackQuery(CallbackQuery callbackQuery) {
         if (callbackQuery.message() == null || callbackQuery.message().chat() == null) {
             return;
         }
         long id = callbackQuery.message().chat().id();
-        if (id != adminChatID) {
+        if (!isAdmin(callbackQuery.from())) {
             send(id, "Du bist kein Admin");
             return;
         }
@@ -101,7 +74,7 @@ public class TelegramBotAPI implements UpdatesListener {
         }
     }
 
-    private void parseCallback(String uid, long senderChatID) throws SQLException, JSONException {
+    private void parseCallback(String uid, long senderChatID) throws SQLException{
         int userID = Integer.parseInt(uid.substring(1));
 
         if (uid.startsWith("w")) {
@@ -111,7 +84,7 @@ public class TelegramBotAPI implements UpdatesListener {
             } else {
                 database.addToWhitelist(userID, "");
                 send(senderChatID, "Nutzer wurde zur Whitelist hinzugefügt");
-                //send(chatIDListed, "Du wurdest von einem Admin zur Whitelist hinzugefügt");
+                send(userID, "Du wurdest von einem Admin zur Whitelist hinzugefügt");
                 Log.i("Added user '" + userID + "' to whitelist");
             }
         } else if (uid.startsWith("b")) {
@@ -129,17 +102,19 @@ public class TelegramBotAPI implements UpdatesListener {
         }
     }
 
-    public void sendImage(Chat chat, User user) {
+    public void sendImage(Message message) {
+        User user=message.from();
+        Chat chat=message.chat();
         if (user.isBot()) {
             return;
         }
 
         try {
-            if (!chat.id().equals(adminChatID) && !database.isWhitelisted(user.id())) {
+            if (!isAdmin(message) && !database.isWhitelisted(user.id())) {
                 Log.i("User " + (user.username() == null ? String.valueOf(user.id()) : user.username()) + " is not whitelisted");
                 send(chat.id(), "Sie haben keine Berechtigung für diesen Befehl");
                 if (!database.isBlacklisted(user.id())) {
-                    sendAdminWhitelistRequest(chat.id(), user);
+                    sendAdminWhitelistRequest(user);
                 } else {
                     Log.d("User " + (user.username() == null ? String.valueOf(user.id()) : user.username()) + " is blacklisted");
                 }
@@ -203,16 +178,7 @@ public class TelegramBotAPI implements UpdatesListener {
         });
     }
 
-    private void sendAdminWhitelistRequest(long chatID, User user) {
-        /*String whitelist=new JSONObject().put("type", "whitelist")
-                .put("userid", user.id())
-                .put("chatid", chatID)
-                .put("username", user.username()).toString();
-        String blacklist=new JSONObject().put("type", "blacklist")
-                .put("userid", user.id())
-                .put("chatid", chatID)
-                .put("username", user.username()).toString();*/
-
+    private void sendAdminWhitelistRequest(User user) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(
                 new InlineKeyboardButton[]{
                         new InlineKeyboardButton("Whitelist").callbackData("w" + user.id()),
@@ -221,11 +187,26 @@ public class TelegramBotAPI implements UpdatesListener {
 
         String message = ("Anfrage von '" + user.username() + "' userid '" + user.id() + "'");
 
-        send(adminChatID, message, inlineKeyboard);
+        send(adminUserID, message, inlineKeyboard);
     }
 
+    private boolean isAdmin(User user){
+        if(user==null){
+            return false;
+        }
+        return user.id().intValue()==adminUserID;
+    }
+
+    private boolean isAdmin(Message message){
+        if(message==null){
+            return false;
+        }
+
+        return isAdmin(message.from());
+    }
+
+    @Override
     public void stop() {
         database.close();
-        bot.removeGetUpdatesListener();
     }
 }

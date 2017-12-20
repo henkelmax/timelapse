@@ -6,7 +6,7 @@
 
     <groupId>de.maxhenkel.timelapse</groupId>
     <artifactId>timelapse</artifactId>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.3-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
