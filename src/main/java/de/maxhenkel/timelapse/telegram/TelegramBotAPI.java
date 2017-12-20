@@ -22,10 +22,12 @@ public class TelegramBotAPI  extends TelegramBotBase{
     private Database database;
     private int adminUserID;
     private long maxMessageDelay;
+    private boolean privateMode;
 
-    public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine) throws SQLException {
+    public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine, boolean privateMode) throws SQLException {
         super(config.getString("api_token", ""));
         this.timelapseEngine = timelapseEngine;
+        this.privateMode=privateMode;
         String sdf = config.getString("telegram_date_format", "dd.MM.yyyy HH:mm:ss");
         simpleDateFormat = new SimpleDateFormat(sdf);
         database = new Database(config);
@@ -44,6 +46,16 @@ public class TelegramBotAPI  extends TelegramBotBase{
             sendImage(message);
         }else if(command.equalsIgnoreCase("/id")){
             send(message.chat().id(), "Ihre User ID ist '" +message.from().id() +"'");
+        }else if(command.equalsIgnoreCase("/private")){
+            if(isAdmin(message)){
+                privateMode=true;
+                send(message.chat().id(), "Private Mode aktiviert");
+            }
+        }else if(command.equalsIgnoreCase("/public")){
+            if(isAdmin(message)){
+                privateMode=false;
+                send(message.chat().id(), "Private Mode deaktiviert");
+            }
         }
     }
 
@@ -131,6 +143,11 @@ public class TelegramBotAPI  extends TelegramBotBase{
 
         if (image == null) {
             send(chat.id(), "Momentan keine Bilder vorhanden");
+            return;
+        }
+
+        if(privateMode){
+            Log.i("Sending no image to " + (user.username() == null ? String.valueOf(user.id()) : user.username()) +" because private mode is activiated");
             return;
         }
 

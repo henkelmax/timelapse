@@ -23,6 +23,7 @@ public class Main {
      * --frame-rate (30 FPS by default. Only applies if convert argument is present)
      * --telegram-bot (true by default. If you want to enable the telegram bot)
      * --frame (true by default. If you want the frame to be present)
+     * --private (false by default)
      */
     public static void main(String[] args) throws IOException, SQLException {
         Arguments arguments=new Arguments(args);
@@ -50,7 +51,7 @@ public class Main {
 
         TelegramBotAPI t=null;
         if(arguments.getBooleanValue("telegram-bot", true)){
-            t=new TelegramBotAPI(config, timelapseEngine);
+            t=new TelegramBotAPI(config, timelapseEngine, arguments.getBooleanValue("private", false));
         }
         TelegramBotAPI telegramBotAPI = t;
 
