@@ -30,8 +30,10 @@ public class TimelapseEngine {
     private byte[] lastImage;
     private long lastImageTime;
     private File lastImageFile;
+    private boolean saveImages;
 
-    public TimelapseEngine(Configuration config) {
+    public TimelapseEngine(Configuration config, boolean saveImages) {
+        this.saveImages=saveImages;
         this.config = config;
         String sdf=config.getString("file_date_format", "yyyy-MM-dd-HH-mm-ss");
         this.simpleDateFormat=new SimpleDateFormat(sdf);

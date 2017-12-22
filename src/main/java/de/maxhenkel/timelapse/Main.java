@@ -24,6 +24,7 @@ public class Main {
      * --telegram-bot (true by default. If you want to enable the telegram bot)
      * --frame (true by default. If you want the frame to be present)
      * --private (false by default)
+     * --save-images (save images true by default)
      */
     public static void main(String[] args) throws IOException, SQLException {
         Arguments arguments=new Arguments(args);
@@ -32,10 +33,12 @@ public class Main {
             Log.setLogLevel(Log.LogLevel.ALL);
         }
 
+        printArguments();
+
         String configPath=arguments.getValue("config-location", "config.properties");
 
         Configuration config=new PropertyConfiguration(configPath);
-        TimelapseEngine timelapseEngine=new TimelapseEngine(config);
+        TimelapseEngine timelapseEngine=new TimelapseEngine(config, arguments.getBooleanValue("save-images", true));
 
         if(arguments.hasKey("convert")){
             int frameRate=arguments.getIntValue("frame-rate", 30);
@@ -108,4 +111,19 @@ public class Main {
         inputHandler.start();
         thread.start();
     }
+
+    public static void printArguments(){
+        Log.i("POSSIBLE ARGUMENTS");
+        Log.i("--config-location [path]");
+        Log.i("--telegram-bot [true/false]");
+        Log.i("--save-images [true/false]");
+        Log.i("--debug-log [true/false]");
+        Log.i("--frame [true/false]");
+        Log.i("--private [true/false]");
+        Log.i("");
+        Log.i("--convert");
+        Log.i("--frame-rate [fps]");
+        Log.i("");
+    }
+
 }
