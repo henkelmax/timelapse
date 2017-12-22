@@ -153,6 +153,7 @@ public class TimelapseEngine {
         }
         config.putString("webcam", webcam.getName());
         setResolution(width, height);
+
     }
 
     public void takePicture() throws IOException {
@@ -190,19 +191,21 @@ public class TimelapseEngine {
 
         int i=0;
 
-        File imageFile;
+        if(saveImages){
+            File imageFile;
 
-        while (true){
-            imageFile=new File(outputFolder, generateFileName(i, "jpg", time));
-            if(!imageFile.exists()){
-                break;
+            while (true){
+                imageFile=new File(outputFolder, generateFileName(i, "jpg", time));
+                if(!imageFile.exists()){
+                    break;
+                }
+                i++;
             }
-            i++;
+
+            save(lastImage, imageFile);
+
+            lastImageFile=imageFile;
         }
-
-        save(lastImage, imageFile);
-
-        lastImageFile=imageFile;
 
         if(listener!=null){
             listener.onImage(bi, time);

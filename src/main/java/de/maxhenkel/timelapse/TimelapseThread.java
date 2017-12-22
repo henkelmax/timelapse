@@ -10,6 +10,7 @@ public class TimelapseThread extends Thread{
 
     public TimelapseThread(TimelapseEngine timelapseEngine){
         this.timelapseEngine=timelapseEngine;
+        setName("TimelapseThread");
     }
 
     @Override
