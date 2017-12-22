@@ -5,6 +5,8 @@ import de.maxhenkel.henkellib.database.SQLiteBase;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Database extends SQLiteBase{
 
@@ -42,25 +44,63 @@ public class Database extends SQLiteBase{
                 .execute("INSERT INTO blacklist (id, comment) VALUES (" +id +", '" +comment +"');");
     }
 
+    public void removeFromWhitelist(int id) throws SQLException {
+        getConnection().createStatement()
+                .execute("DELETE FROM whitelist WHERE id=" +id +";");
+    }
+
+    public void removeFromBlacklist(int id) throws SQLException {
+        getConnection().createStatement()
+                .execute("DELETE FROM blacklist WHERE id=" +id +";");
+    }
+
     public Entry getWhitelistEntry(int id) throws SQLException {
         ResultSet rs=getConnection().createStatement().executeQuery("SELECT * FROM whitelist WHERE id= " +id +";");
 
-        return get(rs);
+        return get(rs, true);
     }
 
     public Entry getBlacklistEntry(int id) throws SQLException {
         ResultSet rs=getConnection().createStatement().executeQuery("SELECT * FROM blacklist WHERE id= " +id +";");
 
-        return get(rs);
+        return get(rs, true);
     }
 
-    private Entry get(ResultSet rs) throws SQLException {
-        if(!rs.next()){
+    public List<Entry> getWhitelistEntries() throws SQLException {
+        ResultSet rs=getConnection().createStatement().executeQuery("SELECT * FROM whitelist;");
+        List<Entry> entries=new ArrayList<>();
+
+        while (rs.next()){
+            Entry e=get(rs, false);
+            if(e!=null){
+                entries.add(e);
+            }
+        }
+
+        return entries;
+    }
+
+    public List<Entry> getBlacklistEntries() throws SQLException {
+        ResultSet rs=getConnection().createStatement().executeQuery("SELECT * FROM blacklist;");
+        List<Entry> entries=new ArrayList<>();
+
+        while (rs.next()){
+            Entry e=get(rs, false);
+            if(e!=null){
+                entries.add(e);
+            }
+        }
+
+        return entries;
+    }
+
+    private Entry get(ResultSet rs, boolean next) throws SQLException {
+        if(next&&!rs.next()){
             return null;
         }
 
-        int i=rs.getInt(0);
-        String comment=rs.getString(1);
+        int i=rs.getInt(1);
+        String comment=rs.getString(2);
         Entry entry=new Entry();
         entry.id=i;
         entry.comment=comment;

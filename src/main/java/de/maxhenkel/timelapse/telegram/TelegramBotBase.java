@@ -33,9 +33,9 @@ public abstract class TelegramBotBase implements UpdatesListener {
         onUpdate(update);
 
         if(update.message()!=null){
-            String command=getCommand(update.message());
+            Command command=getCommand(update.message());
             if(command!=null){
-                onCommand(command, update.message());
+                onCommand(command.getCommand(), command.getArgs(), update.message());
             }
         }
         if(update.callbackQuery()!=null){
@@ -47,7 +47,7 @@ public abstract class TelegramBotBase implements UpdatesListener {
 
     }
 
-    protected void onCommand(String command, Message message){
+    protected void onCommand(String command, String[] args, Message message){
 
     }
 
@@ -55,7 +55,7 @@ public abstract class TelegramBotBase implements UpdatesListener {
 
     }
 
-    protected String getCommand(Message message){
+    protected Command getCommand(Message message){
         if(message.entities()==null){
             return null;
         }
@@ -65,8 +65,14 @@ public abstract class TelegramBotBase implements UpdatesListener {
                 continue;
             }
             String command=message.text().substring(entity.offset(), entity.offset()+entity.length());
+            String[] args=new String[0];
 
-            return command;
+            if(entity.offset()+entity.length()+1<message.text().length()){
+                String argString=message.text().substring(entity.offset()+entity.length()+1);
+
+                args=argString.split(" ");
+            }
+            return new Command(command, args);
         }
 
         return null;
@@ -74,6 +80,24 @@ public abstract class TelegramBotBase implements UpdatesListener {
 
     public void stop(){
         bot.removeGetUpdatesListener();
+    }
+
+    private class Command{
+        private String command;
+        private String[] args;
+
+        public Command(String command, String[] args){
+            this.command=command;
+            this.args=args;
+        }
+
+        public String getCommand() {
+            return command;
+        }
+
+        public String[] getArgs() {
+            return args;
+        }
     }
 
 }
