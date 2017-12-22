@@ -170,7 +170,8 @@ public class TelegramBotAPI extends TelegramBotBase {
             if (whitelist) {
                 send(userID, "Du wurdest von einem Admin zur " + listname + " hinzugefügt");
             }
-            Log.i("Added user '" + userID + "' to " + listname.toLowerCase());
+            String name = comment.isEmpty() ? String.valueOf(userID) : comment;
+            Log.i("Added user " + name + " to " + listname.toLowerCase());
         } catch (SQLException e1) {
             e1.printStackTrace();
             send(senderID, "Nutzer konnte nicht zur Datenbank hinzugefügt werden (Datenbankfehler)");
@@ -200,6 +201,7 @@ public class TelegramBotAPI extends TelegramBotBase {
                 String name = blacklistEntry.getComment().isEmpty() ? String.valueOf(id) : blacklistEntry.getComment();
                 database.removeFromBlacklist(id);
                 send(message.chat().id(), name + " wurde aus der Blacklist entfernt");
+                Log.i("Removed User " +name +" from blacklist");
                 return;
             }
 
@@ -209,6 +211,7 @@ public class TelegramBotAPI extends TelegramBotBase {
                 String name = whitelistEntry.getComment().isEmpty() ? String.valueOf(id) : whitelistEntry.getComment();
                 database.removeFromWhitelist(id);
                 send(message.chat().id(), name + " wurde aus der Whitelist entfernt");
+                Log.i("Removed User " +name +" from whitelist");
                 return;
             }
 
@@ -227,17 +230,17 @@ public class TelegramBotAPI extends TelegramBotBase {
 
         try {
             if (!isAdmin(message) && !database.isWhitelisted(user.id())) {
-                Log.i("User " + (user.username() == null ? String.valueOf(user.id()) : user.username()) + " is not whitelisted");
+                Log.i("User " + getName(chat) + " is not whitelisted");
                 send(chat.id(), "Sie haben keine Berechtigung für diesen Befehl");
                 if (!database.isBlacklisted(user.id())) {
                     sendAdminWhitelistRequest(user);
                 } else {
-                    Log.d("User " + (user.username() == null ? String.valueOf(user.id()) : user.username()) + " is blacklisted");
+                    Log.d("User " + getName(chat) + " is blacklisted");
                 }
                 return;
             }
         } catch (SQLException e) {
-            Log.e("Failed to check whitelist of user " + (user.username() == null ? String.valueOf(user.id()) : user.username()));
+            Log.e("Failed to check whitelist of user " + getName(chat));
             e.printStackTrace();
             send(chat.id(), "Es ist ein fehler bei der Anfrage aufgetreten");
             return;
@@ -251,11 +254,11 @@ public class TelegramBotAPI extends TelegramBotBase {
         }
 
         if (privateMode) {
-            Log.i("Sending no image to " + (user.username() == null ? String.valueOf(user.id()) : user.username()) + " because private mode is activiated");
+            Log.i("Sending no image to " + getName(chat) + " because private mode is activiated");
             return;
         }
 
-        Log.i("Sending image to " + (user.username() == null ? String.valueOf(user.id()) : user.username()));
+        Log.i("Sending image to " + getName(chat));
 
         SendPhoto request = new SendPhoto(chat.id(), image).disableNotification(true);
 
