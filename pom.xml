@@ -20,6 +20,11 @@
             <version>1.0.5-SNAPSHOT</version>
         </dependency>
         <dependency>
+            <groupId>sqlitejdbc</groupId>
+            <artifactId>sqlitejdbc</artifactId>
+            <version>0.5.6</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <!--<artifactId>slf4j-simple</artifactId>-->
@@ -45,6 +50,10 @@
         <repository>
             <id>henkelmax.private</id>
             <url>http://maxhenkel.de:8081/artifactory/henkelmax</url>
+        </repository>
+        <repository>
+            <id>jdbc</id>
+            <url>http://clojars.org/repo/</url>
         </repository>
     </repositories>
 
