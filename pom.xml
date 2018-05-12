@@ -6,13 +6,42 @@
 
     <groupId>de.maxhenkel.timelapse</groupId>
     <artifactId>timelapse</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.5-SNAPSHOT</version>
 
     <dependencies>
         <dependency>
+            <groupId>com.nativelibs4java</groupId>
+            <artifactId>bridj</artifactId>
+            <version>0.7.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.openimaj</groupId>
+            <artifactId>core</artifactId>
+            <version>1.3.6</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.sarxos</groupId>
+            <artifactId>webcam-capture-driver-v4l4j</artifactId>
+            <version>0.3.12</version>
+        </dependency>
+        <dependency>
             <groupId>com.github.sarxos</groupId>
             <artifactId>webcam-capture</artifactId>
-            <version>0.3.11</version>
+            <version>0.3.12</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.nativelibs4java</groupId>
+                    <artifactId>bridj</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.openimaj</groupId>
+                    <artifactId>core</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.github.sarxos</groupId>
+                    <artifactId>webcam-capture-driver-v4l4j</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>de.maxhenkel.henkellib</groupId>
@@ -54,6 +83,14 @@
         <repository>
             <id>jdbc</id>
             <url>http://clojars.org/repo/</url>
+        </repository>
+        <repository>
+            <id>Sonatype OSS Snapshot Repository</id>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+        <repository>
+            <id>openimaj Snapshot Repository</id>
+            <url>http://snapshots.openimaj.org/</url>
         </repository>
     </repositories>
 

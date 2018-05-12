@@ -1,5 +1,7 @@
 package de.maxhenkel.timelapse;
 
+import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
 import de.maxhenkel.henkellib.args.Arguments;
 import de.maxhenkel.henkellib.config.Configuration;
 import de.maxhenkel.henkellib.config.PropertyConfiguration;
@@ -7,7 +9,6 @@ import de.maxhenkel.henkellib.io.InputHandler;
 import de.maxhenkel.henkellib.io.InputStreamInputHandler;
 import de.maxhenkel.henkellib.logging.Log;
 import de.maxhenkel.timelapse.telegram.TelegramBotAPI;
-
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -27,10 +28,12 @@ public class Main {
      * --save-images (save images true by default)
      */
     public static void main(String[] args) throws IOException, SQLException {
+        Webcam.setDriver(new V4l4jDriver());
+
         Arguments arguments=new Arguments(args);
 
         if(arguments.getBooleanValue("debug-log", false)){
-            Log.setLogLevel(Log.LogLevel.ALL);
+            Log.setLogLevel(Log.LogLevel.DEBUG);
         }
 
         printArguments();
