@@ -9,6 +9,8 @@ import de.maxhenkel.henkellib.io.InputHandler;
 import de.maxhenkel.henkellib.io.InputStreamInputHandler;
 import de.maxhenkel.henkellib.logging.Log;
 import de.maxhenkel.timelapse.telegram.TelegramBotAPI;
+import org.apache.commons.lang3.SystemUtils;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
@@ -28,7 +30,9 @@ public class Main {
      * --save-images (save images true by default)
      */
     public static void main(String[] args) throws IOException, SQLException {
-        Webcam.setDriver(new V4l4jDriver());
+        if(SystemUtils.IS_OS_LINUX){
+            Webcam.setDriver(new V4l4jDriver());
+        }
 
         Arguments arguments=new Arguments(args);
 
@@ -41,15 +45,18 @@ public class Main {
         String configPath=arguments.getValue("config-location", "config.properties");
 
         Configuration config=new PropertyConfiguration(configPath);
-        TimelapseEngine timelapseEngine=new TimelapseEngine(config, arguments.getBooleanValue("save-images", true));
+
+        File outputFolder = new File(config.getString("output_folder", new File("timelapse/").getPath()));
 
         if(arguments.hasKey("convert")){
             int frameRate=arguments.getIntValue("frame-rate", 30);
             Log.i("Converting timelapse...");
-            VideoConverter.convert(frameRate, new File("timelapse-" +System.currentTimeMillis() +".mp4"), timelapseEngine.getOutputFolder().listFiles());
+            VideoConverter.convert(frameRate, new File("timelapse-" +System.currentTimeMillis() +".mp4"), outputFolder.listFiles());
             Log.i("Timelapse converted");
             return;
         }
+
+        TimelapseEngine timelapseEngine=new TimelapseEngine(config, outputFolder, arguments.getBooleanValue("save-images", true));
 
         timelapseEngine.printInfo();
 
