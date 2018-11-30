@@ -1,0 +1,7 @@
+.idea
+*.iml
+timelapse
+target
+.settings
+.classpath
+.project

@@ -32,9 +32,10 @@ public class TimelapseEngine {
     private File lastImageFile;
     private boolean saveImages;
 
-    public TimelapseEngine(Configuration config, boolean saveImages) {
+    public TimelapseEngine(Configuration config, File outputFolder, boolean saveImages) {
         this.saveImages=saveImages;
         this.config = config;
+        this.outputFolder=outputFolder;
         String sdf=config.getString("file_date_format", "yyyy-MM-dd-HH-mm-ss");
         this.simpleDateFormat=new SimpleDateFormat(sdf);
         this.width = config.getInt("image_width", 1920);
@@ -45,7 +46,6 @@ public class TimelapseEngine {
             setWebcam(Webcam.getDefault());
         }
         delay = config.getLong("delay", 60000);
-        this.outputFolder = new File(config.getString("output_folder", new File("timelapse/").getPath()));
     }
 
     public void setTimelapseListener(TimelapseListener listener){
