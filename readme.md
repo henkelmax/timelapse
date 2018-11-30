@@ -1,22 +1,52 @@
 # Timelapse Bot
 
+## Startup for Dummies
+
+```
+java -jar timelapse-1.x.x.jar [parameter1] [value1] [parameter2] [value2] [...]
+```
+
+### Examples
+
+---
+
+```
+java -jar timelapse-1.0.5.jar --frame true --telegram-bot false
+```
+This starts the Timelapse Bot with a preview window and without the Telegram Bot enabled
+
+---
+
+```
+java -jar timelapse-1.0.5.jar --convert --frame-rate 60
+```
+This converts the captured images to a video with a frame rate of 60
+
+---
+
+```
+java -jar timelapse-1.0.5.jar --telegram-bot true --save-images false --frame false
+```
+This enables the Telegram Bot but disables the image capturing function
+
+
 ## Start Parameters
 
 `--debug-log` true if you want to see the debug logs
 
 `--config-location` the path to the config.propertes file
 
-`--convert` Starts only the video converter
-
-`--frame-rate` 30 FPS by default. Only applies if convert argument is present
-
 `--telegram-bot` true by default. If you want to enable the telegram bot
 
 `--frame` true by default. If you want the preview window to be present
 
-`--private` false by default
+`--private` false by default. If private mode should be active on startup
 
 `--save-images` save images true by default
+
+`--convert` Starts only the video converter
+
+`--frame-rate` 30 FPS by default. Only applies if convert argument is present
 
 
 ## Config Options
