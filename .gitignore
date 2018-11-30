@@ -1,5 +1,5 @@
-.idea/
+.idea
 *.iml
-timelapse/
-target/
-.settings/
+timelapse
+target
+.settings
