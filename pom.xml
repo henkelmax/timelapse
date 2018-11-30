@@ -79,11 +79,11 @@
     <repositories>
         <repository>
             <id>henkelmax.public</id>
-            <url>http://maxhenkel.de:8081/artifactory/public</url>
+            <url>https://maven.maxhenkel.de/artifactory/public</url>
         </repository>
         <repository>
             <id>henkelmax.private</id>
-            <url>http://maxhenkel.de:8081/artifactory/henkelmax</url>
+            <url>https://maven.maxhenkel.de/artifactory/henkelmax</url>
         </repository>
         <repository>
             <id>jdbc</id>
