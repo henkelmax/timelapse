@@ -3,3 +3,5 @@
 timelapse
 target
 .settings
+.classpath
+.project
