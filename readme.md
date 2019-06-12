@@ -90,3 +90,23 @@ This enables the Telegram Bot but disables the image capturing function
 `/info` sends information about the whitelisted and blacklisted users
 
 `/remove [telegram-id]` removes a user either from the blacklist or the whitelist
+
+## Prerequisites
+
+You need the Oracle JRE to run this program (OpenJDK is not working)
+
+### On Raspberry PI
+
+[Java 8 installation guide](http://wp.brodzinski.net/raspberry-pi-3b/install-latest-java-8-raspbian/)
+
+``` sh 
+sudo apt-get install dirmngr
+
+echo "deb http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee /etc/apt/sources.list.d/webupd8team-java.list
+echo "deb-src http://ppa.launchpad.net/webupd8team/java/ubuntu trusty main" | sudo tee -a /etc/apt/sources.list.d/webupd8team-java.list
+sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys EEA14886
+
+sudo apt-get update
+
+sudo apt-get install oracle-java8-jdk
+```
