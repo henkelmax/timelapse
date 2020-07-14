@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>de.maxhenkel.timelapse</groupId>
     <artifactId>timelapse</artifactId>
-    <version>1.0.6</version>
+    <version>1.0.7</version>
 
     <dependencies>
         <dependency>
@@ -17,7 +16,7 @@
         <dependency>
             <groupId>org.openimaj</groupId>
             <artifactId>core</artifactId>
-            <version>1.3.8</version>
+            <version>1.3.10</version>
         </dependency>
         <dependency>
             <groupId>com.github.sarxos</groupId>
@@ -46,7 +45,7 @@
         <dependency>
             <groupId>de.maxhenkel.henkellib</groupId>
             <artifactId>henkellib</artifactId>
-            <version>1.0.5-SNAPSHOT</version>
+            <version>1.0.6</version>
         </dependency>
         <dependency>
             <groupId>sqlitejdbc</groupId>
@@ -57,12 +56,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <!--<artifactId>slf4j-simple</artifactId>-->
-            <version>1.7.26</version>
+            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>com.github.pengrad</groupId>
             <artifactId>java-telegram-bot-api</artifactId>
-            <version>4.3.0</version>
+            <version>4.9.0</version>
         </dependency>
         <dependency>
             <groupId>xuggle</groupId>
@@ -72,30 +71,34 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.9</version>
+            <version>3.10</version>
         </dependency>
     </dependencies>
 
     <repositories>
         <repository>
             <id>henkelmax.public</id>
-            <url>https://maven.maxhenkel.de/artifactory/public</url>
+            <url>https://maven.maxhenkel.de/repository/public</url>
         </repository>
         <repository>
-            <id>henkelmax.private</id>
-            <url>https://maven.maxhenkel.de/artifactory/henkelmax</url>
-        </repository>
-        <repository>
-            <id>jdbc</id>
-            <url>http://clojars.org/repo/</url>
+            <id>clojars.org</id>
+            <url>https://repo.clojars.org</url>
         </repository>
         <repository>
             <id>Sonatype OSS Snapshot Repository</id>
-            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+        </repository>
+        <repository>
+            <id>openimaj Repository</id>
+            <url>http://maven.openimaj.org/</url>
         </repository>
         <repository>
             <id>openimaj Snapshot Repository</id>
-            <url>http://snapshots.openimaj.org/</url>
+            <url>https://snapshots.openimaj.org/</url>
+        </repository>
+        <repository>
+            <id>xuggle repo</id>
+            <url>https://www.dcm4che.org/maven2/</url>
         </repository>
     </repositories>
 
