@@ -30,48 +30,48 @@ public class Main {
      * --save-images (save images true by default)
      */
     public static void main(String[] args) throws IOException, SQLException {
-        if(SystemUtils.IS_OS_LINUX){
+        if (SystemUtils.IS_OS_LINUX) {
             Webcam.setDriver(new V4l4jDriver());
         }
 
-        Arguments arguments=new Arguments(args);
+        Arguments arguments = new Arguments(args);
 
-        if(arguments.getBooleanValue("debug-log", false)){
+        if (arguments.getBooleanValue("debug-log", false)) {
             Log.setLogLevel(Log.LogLevel.DEBUG);
         }
 
         printArguments();
 
-        String configPath=arguments.getValue("config-location", "config.properties");
+        String configPath = arguments.getValue("config-location", "config.properties");
 
-        Configuration config=new PropertyConfiguration(configPath);
+        Configuration config = new PropertyConfiguration(configPath);
 
         File outputFolder = new File(config.getString("output_folder", new File("timelapse/").getPath()));
 
-        if(arguments.hasKey("convert")){
-            int frameRate=arguments.getIntValue("frame-rate", 30);
+        if (arguments.hasKey("convert")) {
+            int frameRate = arguments.getIntValue("frame-rate", 30);
             Log.i("Converting timelapse...");
-            VideoConverter.convert(frameRate, new File("timelapse-" +System.currentTimeMillis() +".mp4"), outputFolder.listFiles());
+            VideoConverter.convert(frameRate, new File("timelapse-" + System.currentTimeMillis() + ".mp4"), outputFolder.listFiles());
             Log.i("Timelapse converted");
             return;
         }
 
-        TimelapseEngine timelapseEngine=new TimelapseEngine(config, outputFolder, arguments.getBooleanValue("save-images", true));
+        TimelapseEngine timelapseEngine = new TimelapseEngine(config, outputFolder, arguments.getBooleanValue("save-images", true));
 
         timelapseEngine.printInfo();
 
-        TimelapseThread thread=new TimelapseThread(timelapseEngine);
+        TimelapseThread thread = new TimelapseThread(timelapseEngine);
 
-        TelegramBotAPI t=null;
-        if(arguments.getBooleanValue("telegram-bot", true)){
-            t=new TelegramBotAPI(config, timelapseEngine, arguments.getBooleanValue("private", false));
+        TelegramBotAPI t = null;
+        if (arguments.getBooleanValue("telegram-bot", true)) {
+            t = new TelegramBotAPI(config, timelapseEngine, arguments.getBooleanValue("private", false));
         }
         TelegramBotAPI telegramBotAPI = t;
 
-        InputHandler inputHandler=new InputStreamInputHandler();
+        InputHandler inputHandler = new InputStreamInputHandler();
 
-        TimelapseFrame frame=null;
-        if(arguments.getBooleanValue("frame", true)){
+        TimelapseFrame frame = null;
+        if (arguments.getBooleanValue("frame", true)) {
             frame = new TimelapseFrame(config);
 
             frame.addWindowListener(new WindowAdapter() {
@@ -87,42 +87,39 @@ public class Main {
 
 
         TimelapseFrame finalFrame = frame;
-        inputHandler.registerCommands(new InputHandler.Command() {
-            @Override
-            public void onCommand(String s, String[] strings) {
+        inputHandler.registerCommands((s, strings) -> {
 
-                inputHandler.stop();
+            inputHandler.stop();
 
-                if(finalFrame !=null){
-                    finalFrame.dispose();
-                }
-
-                if(telegramBotAPI !=null){
-                    telegramBotAPI.stop();
-                }
-                thread.stopTimelapse();
-                try {
-                    thread.join(10000);//Wait max 10 seconds for thread to stop
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-                timelapseEngine.close();
-
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e1) {
-                    e1.printStackTrace();
-                }
-
-                System.exit(0);
+            if (finalFrame != null) {
+                finalFrame.dispose();
             }
+
+            if (telegramBotAPI != null) {
+                telegramBotAPI.stop();
+            }
+            thread.stopTimelapse();
+            try {
+                thread.join(10000);//Wait max 10 seconds for thread to stop
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+            timelapseEngine.close();
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e1) {
+                e1.printStackTrace();
+            }
+
+            System.exit(0);
         }, "stop", "exit");
 
         inputHandler.start();
         thread.start();
     }
 
-    public static void printArguments(){
+    public static void printArguments() {
         Log.i("POSSIBLE ARGUMENTS");
         Log.i("--config-location [path]");
         Log.i("--telegram-bot [true/false]");

@@ -33,14 +33,14 @@ public class TimelapseEngine {
     private boolean saveImages;
 
     public TimelapseEngine(Configuration config, File outputFolder, boolean saveImages) {
-        this.saveImages=saveImages;
+        this.saveImages = saveImages;
         this.config = config;
-        this.outputFolder=outputFolder;
-        String sdf=config.getString("file_date_format", "yyyy-MM-dd-HH-mm-ss");
-        this.simpleDateFormat=new SimpleDateFormat(sdf);
+        this.outputFolder = outputFolder;
+        String sdf = config.getString("file_date_format", "yyyy-MM-dd-HH-mm-ss");
+        this.simpleDateFormat = new SimpleDateFormat(sdf);
         this.width = config.getInt("image_width", 1920);
         this.height = config.getInt("image_height", 1080);
-        this.compression=config.getFloat("compression", 1.0F);
+        this.compression = config.getFloat("compression", 1.0F);
         setWebcam(Webcam.getWebcamByName(config.getString("webcam", "")));
         if (webcam == null) {
             setWebcam(Webcam.getDefault());
@@ -48,8 +48,8 @@ public class TimelapseEngine {
         delay = config.getLong("delay", 60000);
     }
 
-    public void setTimelapseListener(TimelapseListener listener){
-        this.listener=listener;
+    public void setTimelapseListener(TimelapseListener listener) {
+        this.listener = listener;
     }
 
     public void printInfo() {
@@ -113,7 +113,7 @@ public class TimelapseEngine {
         return lastImage;
     }
 
-    public long getLastImageTime(){
+    public long getLastImageTime() {
         return lastImageTime;
     }
 
@@ -121,8 +121,8 @@ public class TimelapseEngine {
         return lastImageFile;
     }
 
-    public void setCompression(float compression){
-        this.compression=compression;
+    public void setCompression(float compression) {
+        this.compression = compression;
         config.putFloat("compression", compression);
     }
 
@@ -144,11 +144,11 @@ public class TimelapseEngine {
     }
 
     public void setWebcam(Webcam w) {
-        if(webcam!=null){
+        if (webcam != null) {
             webcam.close();
         }
         this.webcam = w;
-        if(webcam==null){
+        if (webcam == null) {
             return;
         }
         config.putString("webcam", webcam.getName());
@@ -162,41 +162,41 @@ public class TimelapseEngine {
             return;
         }
 
-        if(!outputFolder.exists()){
+        if (!outputFolder.exists()) {
             outputFolder.mkdirs();
         }
 
-        if(!outputFolder.isDirectory()){
+        if (!outputFolder.isDirectory()) {
             Log.e("Output Folder is no Directory");
             return;
         }
 
-        if(!webcam.isOpen()){
+        if (!webcam.isOpen()) {
             if (!webcam.open()) {
                 Log.e("Could not open Webcam");
                 return;
             }
         }
 
-        BufferedImage bi=webcam.getImage();
-        long time=System.currentTimeMillis();
+        BufferedImage bi = webcam.getImage();
+        long time = System.currentTimeMillis();
 
-        if(bi==null){
+        if (bi == null) {
             Log.e("Failed to capture Image");
             return;
         }
 
-        lastImage=getImage(bi, compression);
-        lastImageTime=time;
+        lastImage = getImage(bi, compression);
+        lastImageTime = time;
 
-        int i=0;
+        int i = 0;
 
-        if(saveImages){
+        if (saveImages) {
             File imageFile;
 
-            while (true){
-                imageFile=new File(outputFolder, generateFileName(i, "jpg", time));
-                if(!imageFile.exists()){
+            while (true) {
+                imageFile = new File(outputFolder, generateFileName(i, "jpg", time));
+                if (!imageFile.exists()) {
                     break;
                 }
                 i++;
@@ -204,16 +204,16 @@ public class TimelapseEngine {
 
             save(lastImage, imageFile);
 
-            lastImageFile=imageFile;
+            lastImageFile = imageFile;
         }
 
-        if(listener!=null){
+        if (listener != null) {
             listener.onImage(bi, time);
         }
     }
 
     private String generateFileName(int i, String fileEnding, long time) {
-        return TimeFormatter.format(simpleDateFormat, time) + (i <= 0 ? "" : "-" +i) + "." +fileEnding;
+        return TimeFormatter.format(simpleDateFormat, time) + (i <= 0 ? "" : "-" + i) + "." + fileEnding;
     }
 
     public static byte[] getImage(BufferedImage image, float compression) throws IOException {
@@ -222,7 +222,7 @@ public class TimelapseEngine {
         jpgWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
         jpgWriteParam.setCompressionQuality(compression);
 
-        ByteArrayOutputStream byteArrayOutputStream=new ByteArrayOutputStream();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ImageOutputStream outputStream = new MemoryCacheImageOutputStream(byteArrayOutputStream);
 
         jpgWriter.setOutput(outputStream);
@@ -232,25 +232,25 @@ public class TimelapseEngine {
         outputStream.close();
 
         byteArrayOutputStream.flush();
-        byte[] data=byteArrayOutputStream.toByteArray();
+        byte[] data = byteArrayOutputStream.toByteArray();
         byteArrayOutputStream.close();
         return data;
     }
 
     public static void save(byte[] image, File file) throws IOException {
-        FileOutputStream fos=new FileOutputStream(file);
+        FileOutputStream fos = new FileOutputStream(file);
         fos.write(image);
         fos.flush();
         fos.close();
     }
 
-    public void close(){
-        if(webcam!=null){
+    public void close() {
+        if (webcam != null) {
             webcam.close();
         }
     }
 
-    public static interface TimelapseListener{
+    public static interface TimelapseListener {
         public void onImage(BufferedImage image, long time);
     }
 

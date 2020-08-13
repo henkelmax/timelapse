@@ -16,13 +16,13 @@ public class ImageLabel extends JPanel {
         setBorder(null);
         setBackground(Color.BLACK);
         setLayout(new BorderLayout());
-        this.label=new JLabel("", SwingConstants.CENTER);
+        this.label = new JLabel("", SwingConstants.CENTER);
         label.setFont(new Font(label.getFont().getName(), Font.PLAIN, 24));
         label.setForeground(Color.WHITE);
         add(label, BorderLayout.SOUTH);
     }
 
-    public void setLabel(String txt){
+    public void setLabel(String txt) {
         this.label.setText(txt);
     }
 
@@ -38,7 +38,7 @@ public class ImageLabel extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        if(image==null){
+        if (image == null) {
             return;
         }
 

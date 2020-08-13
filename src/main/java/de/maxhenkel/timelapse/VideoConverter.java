@@ -14,12 +14,12 @@ import java.util.concurrent.TimeUnit;
 public class VideoConverter {
 
     public static void convert(int frameRate, File output, File[] images) throws IOException {
-        if(frameRate<=0){
-            frameRate=1;
+        if (frameRate <= 0) {
+            frameRate = 1;
         }
 
-        long delay= TimeUnit.SECONDS.toNanos(1)/frameRate;
-        delay=Math.max(delay, 1);
+        long delay = TimeUnit.SECONDS.toNanos(1) / frameRate;
+        delay = Math.max(delay, 1);
 
         IMediaWriter writer = ToolFactory.makeWriter(output.getAbsolutePath());
 
@@ -27,7 +27,7 @@ public class VideoConverter {
 
         long time = 0;
         for (File file : images) {
-            if(!FileUtils.getFileExtension(file).equalsIgnoreCase("jpg")){
+            if (!FileUtils.getFileExtension(file).equalsIgnoreCase("jpg")) {
                 continue;
             }
             BufferedImage screen = ImageIO.read(file);

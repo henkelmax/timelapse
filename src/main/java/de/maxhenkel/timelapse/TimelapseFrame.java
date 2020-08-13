@@ -5,8 +5,6 @@ import de.maxhenkel.henkellib.time.TimeFormatter;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.text.SimpleDateFormat;
 
@@ -21,7 +19,7 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String sdf=config.getString("frame_date_format", "dd.MM.yyyy HH:mm:ss");
+        String sdf = config.getString("frame_date_format", "dd.MM.yyyy HH:mm:ss");
         simpleDateFormat = new SimpleDateFormat(sdf);
 
         setTitle("Timelapse");
