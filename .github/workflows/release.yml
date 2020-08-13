@@ -3,14 +3,14 @@ on:
     types:
       - created
 
-name: Upload Release Asset
+name: Build
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
-    name: Upload Release Asset
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
