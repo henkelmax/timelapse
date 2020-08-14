@@ -1,7 +1,6 @@
 package de.maxhenkel.timelapse;
 
-import de.maxhenkel.henkellib.config.Configuration;
-import de.maxhenkel.henkellib.database.SQLiteBase;
+import de.maxhenkel.simpleconfig.Configuration;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -124,4 +123,5 @@ public class Database extends SQLiteBase {
             return id;
         }
     }
+
 }

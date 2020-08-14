@@ -1,9 +1,9 @@
 package de.maxhenkel.timelapse;
 
 import com.github.sarxos.webcam.Webcam;
-import de.maxhenkel.henkellib.config.Configuration;
-import de.maxhenkel.henkellib.logging.Log;
-import de.maxhenkel.henkellib.time.TimeFormatter;
+import de.maxhenkel.simpleconfig.Configuration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -18,6 +18,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class TimelapseEngine {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private Webcam webcam;
     private Configuration config;
@@ -55,14 +57,14 @@ public class TimelapseEngine {
     public void printInfo() {
         List<Webcam> webcams = Webcam.getWebcams();
 
-        Log.i("Available Webcams:");
+        LOGGER.info("Available Webcams:");
 
         for (Webcam webcam : webcams) {
-            Log.i(webcam.getDevice().getName());
+            LOGGER.info(webcam.getDevice().getName());
         }
 
         if (webcams.isEmpty()) {
-            Log.i("No webcams");
+            LOGGER.info("No webcams");
             return;
         }
 
@@ -70,34 +72,34 @@ public class TimelapseEngine {
             return;
         }
 
-        Log.i("");
+        LOGGER.info("");
 
-        Log.i("Selected Webcam");
+        LOGGER.info("Selected Webcam");
 
-        Log.i(webcam.getName());
+        LOGGER.info(webcam.getName());
 
-        Log.i("");
+        LOGGER.info("");
 
-        Log.i("View sizes:");
+        LOGGER.info("View sizes:");
 
         for (Dimension dim : webcam.getViewSizes()) {
-            Log.i((int) dim.getWidth() + "x" + (int) dim.getHeight());
+            LOGGER.info((int) dim.getWidth() + "x" + (int) dim.getHeight());
         }
-        Log.i("");
+        LOGGER.info("");
 
-        Log.i("Custom view sizes");
+        LOGGER.info("Custom view sizes");
 
         for (Dimension dim : webcam.getCustomViewSizes()) {
-            Log.i((int) dim.getWidth() + "x" + (int) dim.getHeight());
+            LOGGER.info((int) dim.getWidth() + "x" + (int) dim.getHeight());
         }
-        Log.i("");
+        LOGGER.info("");
     }
 
     public void setResolution(int width, int height) {
         this.width = width;
         this.height = height;
-        config.putInt("image_width", width);
-        config.putInt("image_height", height);
+        config.put("image_width", width);
+        config.put("image_height", height);
 
         if (webcam != null) {
             webcam.setCustomViewSizes(new Dimension[]{new Dimension(width, height)});
@@ -123,7 +125,7 @@ public class TimelapseEngine {
 
     public void setCompression(float compression) {
         this.compression = compression;
-        config.putFloat("compression", compression);
+        config.put("compression", compression);
     }
 
     public long getDelay() {
@@ -132,7 +134,7 @@ public class TimelapseEngine {
 
     public void setDelay(long delay) {
         this.delay = delay;
-        config.putLong("delay", delay);
+        config.put("delay", delay);
     }
 
     public List<Webcam> getWebcams() {
@@ -151,14 +153,14 @@ public class TimelapseEngine {
         if (webcam == null) {
             return;
         }
-        config.putString("webcam", webcam.getName());
+        config.put("webcam", webcam.getName());
         setResolution(width, height);
 
     }
 
     public void takePicture() throws IOException {
         if (webcam == null) {
-            Log.e("Cant take picture. No Webcam");
+            LOGGER.error("Cant take picture. No Webcam");
             return;
         }
 
@@ -167,13 +169,13 @@ public class TimelapseEngine {
         }
 
         if (!outputFolder.isDirectory()) {
-            Log.e("Output Folder is no Directory");
+            LOGGER.error("Output Folder is no Directory");
             return;
         }
 
         if (!webcam.isOpen()) {
             if (!webcam.open()) {
-                Log.e("Could not open Webcam");
+                LOGGER.error("Could not open Webcam");
                 return;
             }
         }
@@ -182,7 +184,7 @@ public class TimelapseEngine {
         long time = System.currentTimeMillis();
 
         if (bi == null) {
-            Log.e("Failed to capture Image");
+            LOGGER.error("Failed to capture Image");
             return;
         }
 
@@ -213,7 +215,7 @@ public class TimelapseEngine {
     }
 
     private String generateFileName(int i, String fileEnding, long time) {
-        return TimeFormatter.format(simpleDateFormat, time) + (i <= 0 ? "" : "-" + i) + "." + fileEnding;
+        return Main.format(simpleDateFormat, time) + (i <= 0 ? "" : "-" + i) + "." + fileEnding;
     }
 
     public static byte[] getImage(BufferedImage image, float compression) throws IOException {
@@ -250,8 +252,8 @@ public class TimelapseEngine {
         }
     }
 
-    public static interface TimelapseListener {
-        public void onImage(BufferedImage image, long time);
+    public interface TimelapseListener {
+        void onImage(BufferedImage image, long time);
     }
 
 }

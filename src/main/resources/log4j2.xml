@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration status="OFF">
+    <Properties>
+        <Property name="log-pattern">[%d{yyyy-MM-dd HH:mm:ss}] %-5p: %m%n</Property>
+    </Properties>
+    <appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout>
+                <pattern>${log-pattern}</pattern>
+            </PatternLayout>
+        </Console>
+    </appenders>
+    <Loggers>
+        <logger name="de.maxhenkel" level="trace" additivity="false">
+            <AppenderRef ref="Console" />
+        </logger>
+    </Loggers>
+</configuration>

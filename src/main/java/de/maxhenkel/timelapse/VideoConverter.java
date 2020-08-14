@@ -3,7 +3,6 @@ package de.maxhenkel.timelapse;
 import com.xuggle.mediatool.IMediaWriter;
 import com.xuggle.mediatool.ToolFactory;
 import com.xuggle.xuggler.ICodec;
-import de.maxhenkel.henkellib.io.FileUtils;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -27,7 +26,7 @@ public class VideoConverter {
 
         long time = 0;
         for (File file : images) {
-            if (!FileUtils.getFileExtension(file).equalsIgnoreCase("jpg")) {
+            if (!file.getName().toLowerCase().endsWith(".jpg")) {
                 continue;
             }
             BufferedImage screen = ImageIO.read(file);

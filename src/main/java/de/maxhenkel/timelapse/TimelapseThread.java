@@ -1,8 +1,11 @@
 package de.maxhenkel.timelapse;
 
-import de.maxhenkel.henkellib.logging.Log;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class TimelapseThread extends Thread {
+
+    private static final Logger LOGGER = LogManager.getLogger();
 
     private TimelapseEngine timelapseEngine;
     private long lastImage;
@@ -31,7 +34,7 @@ public class TimelapseThread extends Thread {
             } catch (InterruptedException e) {
             }
         }
-        Log.i("Timelapse Thread stopped");
+        LOGGER.info("Timelapse Thread stopped");
     }
 
     private long calculateTime() {
@@ -42,4 +45,5 @@ public class TimelapseThread extends Thread {
         stopped = true;
         interrupt();
     }
+
 }

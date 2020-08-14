@@ -1,7 +1,6 @@
 package de.maxhenkel.timelapse;
 
-import de.maxhenkel.henkellib.config.Configuration;
-import de.maxhenkel.henkellib.time.TimeFormatter;
+import de.maxhenkel.simpleconfig.Configuration;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,6 +33,7 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
 
     public void onImage(BufferedImage image, long time) {
         imageLabel.setImage(image);
-        imageLabel.setLabel(TimeFormatter.format(simpleDateFormat, time));
+        imageLabel.setLabel(Main.format(simpleDateFormat, time));
     }
+
 }

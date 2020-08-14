@@ -1,18 +1,25 @@
 package de.maxhenkel.timelapse.telegram;
 
 import com.pengrad.telegrambot.Callback;
-import com.pengrad.telegrambot.model.*;
-import com.pengrad.telegrambot.model.request.*;
+import com.pengrad.telegrambot.model.CallbackQuery;
+import com.pengrad.telegrambot.model.Chat;
+import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.User;
+import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
+import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.Keyboard;
+import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.GetChat;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.GetChatResponse;
 import com.pengrad.telegrambot.response.SendResponse;
-import de.maxhenkel.henkellib.config.Configuration;
-import de.maxhenkel.henkellib.logging.Log;
-import de.maxhenkel.henkellib.time.TimeFormatter;
+import de.maxhenkel.simpleconfig.Configuration;
 import de.maxhenkel.timelapse.Database;
+import de.maxhenkel.timelapse.Main;
 import de.maxhenkel.timelapse.TimelapseEngine;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -21,11 +28,13 @@ import java.util.List;
 
 public class TelegramBotAPI extends TelegramBotBase {
 
-    private TimelapseEngine timelapseEngine;
-    private SimpleDateFormat simpleDateFormat;
-    private Database database;
-    private int adminUserID;
-    private long maxMessageDelay;
+    private static final Logger LOGGER = LogManager.getLogger();
+
+    private final TimelapseEngine timelapseEngine;
+    private final SimpleDateFormat simpleDateFormat;
+    private final Database database;
+    private final int adminUserID;
+    private final long maxMessageDelay;
     private boolean privateMode;
 
     public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine, boolean privateMode) throws SQLException {
@@ -42,7 +51,7 @@ public class TelegramBotAPI extends TelegramBotBase {
     @Override
     protected void onCommand(String command, String[] args, Message message) {
         if ((System.currentTimeMillis() - (message.date() * 1000L)) > maxMessageDelay) {
-            Log.d("Ignoring old messages");
+            LOGGER.debug("Ignoring old messages");
             return;
         }
 
@@ -89,11 +98,11 @@ public class TelegramBotAPI extends TelegramBotBase {
         try {
             parseCallback(message, id);
         } catch (SQLException e) {
-            Log.e("Failed to process callback");
+            LOGGER.error("Failed to process callback");
             e.printStackTrace();
             send(id, "Database error");
         } catch (Exception e) {
-            Log.e("Failed to process callback");
+            LOGGER.error("Failed to process callback");
             e.printStackTrace();
         }
     }
@@ -104,7 +113,6 @@ public class TelegramBotAPI extends TelegramBotBase {
         if (uid.startsWith("w")) {
             if (database.isWhitelisted(userID)) {
                 send(senderChatID, "This user is already whitelisted");
-                return;
             } else {
                 bot.execute(new GetChat(userID), new Callback<GetChat, GetChatResponse>() {
                     @Override
@@ -121,10 +129,8 @@ public class TelegramBotAPI extends TelegramBotBase {
         } else if (uid.startsWith("b")) {
             if (database.isWhitelisted(userID)) {
                 send(senderChatID, "This user is already whitelisted");
-                return;
             } else if (database.isBlacklisted(userID)) {
                 send(senderChatID, "This user is already blacklisted");
-                return;
             } else {
                 bot.execute(new GetChat(userID), new Callback<GetChat, GetChatResponse>() {
                     @Override
@@ -171,7 +177,7 @@ public class TelegramBotAPI extends TelegramBotBase {
                 send(userID, "You were added to the " + listname + " by an admin");
             }
             String name = comment.isEmpty() ? String.valueOf(userID) : comment;
-            Log.i("Added user " + name + " to " + listname.toLowerCase());
+            LOGGER.info("Added user " + name + " to " + listname.toLowerCase());
         } catch (SQLException e1) {
             e1.printStackTrace();
             send(senderID, "Couldn't add user to database (Database error)");
@@ -201,7 +207,7 @@ public class TelegramBotAPI extends TelegramBotBase {
                 String name = blacklistEntry.getComment().isEmpty() ? String.valueOf(id) : blacklistEntry.getComment();
                 database.removeFromBlacklist(id);
                 send(message.chat().id(), name + " was removed from the blacklist");
-                Log.i("Removed User " + name + " from blacklist");
+                LOGGER.info("Removed User " + name + " from blacklist");
                 return;
             }
 
@@ -211,7 +217,7 @@ public class TelegramBotAPI extends TelegramBotBase {
                 String name = whitelistEntry.getComment().isEmpty() ? String.valueOf(id) : whitelistEntry.getComment();
                 database.removeFromWhitelist(id);
                 send(message.chat().id(), name + " was removed from the whitelist");
-                Log.i("Removed User " + name + " from whitelist");
+                LOGGER.info("Removed User " + name + " from whitelist");
                 return;
             }
 
@@ -230,17 +236,17 @@ public class TelegramBotAPI extends TelegramBotBase {
 
         try {
             if (!isAdmin(message) && !database.isWhitelisted(user.id())) {
-                Log.i("User " + getName(chat) + " is not whitelisted");
+                LOGGER.info("User " + getName(chat) + " is not whitelisted");
                 send(chat.id(), "You don't have permission for this command");
                 if (!database.isBlacklisted(user.id())) {
                     sendAdminWhitelistRequest(user);
                 } else {
-                    Log.d("User " + getName(chat) + " is blacklisted");
+                    LOGGER.debug("User " + getName(chat) + " is blacklisted");
                 }
                 return;
             }
         } catch (SQLException e) {
-            Log.e("Failed to check whitelist of user " + getName(chat));
+            LOGGER.error("Failed to check whitelist of user " + getName(chat));
             e.printStackTrace();
             send(chat.id(), "An error occurred processing this request");
             return;
@@ -254,11 +260,11 @@ public class TelegramBotAPI extends TelegramBotBase {
         }
 
         if (privateMode) {
-            Log.i("Sending no image to " + getName(chat) + " because private mode is activiated");
+            LOGGER.info("Sending no image to " + getName(chat) + " because private mode is activiated");
             return;
         }
 
-        Log.i("Sending image to " + getName(chat));
+        LOGGER.info("Sending image to " + getName(chat));
 
         SendPhoto request = new SendPhoto(chat.id(), image).disableNotification(true);
 
@@ -266,13 +272,13 @@ public class TelegramBotAPI extends TelegramBotBase {
             @Override
             public void onResponse(SendPhoto request, SendResponse response) {
                 if (timelapseEngine.getLastImageTime() > 0) {
-                    send(chat.id(), "Picture taken on " + TimeFormatter.format(simpleDateFormat, timelapseEngine.getLastImageTime()));
+                    send(chat.id(), "Picture taken on " + Main.format(simpleDateFormat, timelapseEngine.getLastImageTime()));
                 }
             }
 
             @Override
             public void onFailure(SendPhoto request, IOException e) {
-                if (Log.isDebug()) {
+                if (LOGGER.isDebugEnabled()) {
                     e.printStackTrace();
                 }
             }
@@ -316,24 +322,19 @@ public class TelegramBotAPI extends TelegramBotBase {
 
     private void sendInfo(Message message) {
         try {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             List<Database.Entry> whitelist = database.getWhitelistEntries();
 
-            sb.append("<b>Whitelist</b>");
-            sb.append("\n");
+            sb.append("<b>Whitelist</b>\n");
             for (Database.Entry entry : whitelist) {
-                sb.append(entry.getId() + ": " + entry.getComment());
-                sb.append("\n");
+                sb.append(entry.getId()).append(": ").append(entry.getComment()).append("\n");
             }
 
             List<Database.Entry> blacklist = database.getBlacklistEntries();
 
-            sb.append("\n");
-            sb.append("<b>Blacklist</b>");
-            sb.append("\n");
+            sb.append("\n<b>Blacklist</b>\n");
             for (Database.Entry entry : blacklist) {
-                sb.append(entry.getId() + ": " + entry.getComment());
-                sb.append("\n");
+                sb.append(entry.getId()).append(": ").append(entry.getComment()).append("\n");
             }
 
             send(message.chat().id(), sb.toString());
@@ -362,4 +363,5 @@ public class TelegramBotAPI extends TelegramBotBase {
     public void stop() {
         database.close();
     }
+
 }
