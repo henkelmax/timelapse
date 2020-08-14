@@ -37,13 +37,13 @@ public class TelegramBotAPI extends TelegramBotBase {
     private final long maxMessageDelay;
     private boolean privateMode;
 
-    public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine, boolean privateMode) throws SQLException {
+    public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine, String databasePath, boolean privateMode) throws SQLException {
         super(config.getString("api_token", ""));
         this.timelapseEngine = timelapseEngine;
         this.privateMode = privateMode;
         String sdf = config.getString("telegram_date_format", "dd.MM.yyyy HH:mm:ss");
         simpleDateFormat = new SimpleDateFormat(sdf);
-        database = new Database(config);
+        database = new Database(databasePath);
         adminUserID = config.getInt("admin_user_id", -1);
         maxMessageDelay = config.getLong("max_message_delay", 60000);
     }

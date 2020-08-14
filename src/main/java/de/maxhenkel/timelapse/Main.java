@@ -36,6 +36,7 @@ public class Main {
         options.addOption(Option.builder("p").longOpt("private").desc("Enables private mode").build());
         options.addOption(Option.builder("F").longOpt("frame").hasArg().argName("true|false").desc("Shows a frame with preview images").build());
         options.addOption(Option.builder("o").longOpt("output-folder").hasArg().argName("path").desc("The image output folder path").build());
+        options.addOption(Option.builder("D").longOpt("database-path").hasArg().argName("path").desc("The database path for the telegram bot").build());
 
         options.addOption(Option.builder("C").longOpt("convert").desc("Start only the video converter").build());
         options.addOption(Option.builder("f").longOpt("frame-rate").hasArg().argName("fps").desc("The frame rate for the converter").build());
@@ -74,7 +75,7 @@ public class Main {
         TimelapseThread thread = new TimelapseThread(timelapseEngine);
 
         if (cmd.hasOption("t")) {
-            new TelegramBotAPI(config, timelapseEngine, cmd.hasOption("p"));
+            new TelegramBotAPI(config, timelapseEngine, cmd.getOptionValue("D", "database.db"), cmd.hasOption("p"));
         }
 
         TimelapseFrame frame;

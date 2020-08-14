@@ -14,26 +14,32 @@ A program that creates timelapses.
 
 ## Start Parameters
 
-`--debug-log` true if you want to see the debug logs
-
-`--config-location` the path to the config.propertes file
-
-`--telegram-bot` true by default. If you want to enable the telegram bot
-
-`--frame` true by default. If you want the preview window to be present
-
-`--private` false by default. If private mode should be active on startup
-
-`--save-images` save images true by default
-
-`--convert` Starts only the video converter
-
-`--frame-rate` 30 FPS by default. Only applies if convert argument is present
+ `-c,--config-location <path>`     The config path
+ 
+ `-C,--convert`                    Start only the video converter
+ 
+ `-d,--debug-log`                  Enables debug logs
+ 
+ `-D,--database-path <path>`       The database path for the telegram bot
+ 
+ `-F,--frame <true|false>`         Shows a frame with preview images
+ 
+ `-f,--frame-rate <fps>`           The frame rate for the converter (30 FPS by default)
+ 
+ `-h,--help`                       Displays possible arguments
+ 
+ `-o,--output-folder <path>`       The image output folder path
+ 
+ `-p,--private`                    Enables private mode
+ 
+ `-s,--save-images <true|false>`   Save images
+ 
+ `-t,--telegram-bot`               Enables the telegram bot
 
 ## Examples
 
 ```
-java -jar timelapse-1.0.5.jar --frame true --telegram-bot false
+java -jar timelapse-1.0.5.jar --frame true --telegram-bot
 ```
 This starts the Timelapse Bot with a preview window and without the Telegram Bot enabled
 
@@ -47,10 +53,9 @@ This converts the captured images to a video with a frame rate of 60
 ---
 
 ```
-java -jar timelapse-1.0.5.jar --telegram-bot true --save-images false --frame false
+java -jar timelapse-1.0.5.jar --telegram-bot --save-images false --frame false
 ```
 This enables the Telegram Bot but disables the image capturing function
-
 
 ## Config Options
 
@@ -72,11 +77,7 @@ This enables the Telegram Bot but disables the image capturing function
 
 `admin_user_id` the telegram user ID of the admin
 
-`output_folder` the folder name for the images
-
 `max_message_delay` the timeout for Telegram messages to be answered (For example if the bot is not running)
-
-`database_path` the path to the database file containing the data related to the telegram users
 
 `compression` the compression rate for the output images (0.0-1.0)
 

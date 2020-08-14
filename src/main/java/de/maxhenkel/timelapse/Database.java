@@ -1,7 +1,5 @@
 package de.maxhenkel.timelapse;
 
-import de.maxhenkel.simpleconfig.Configuration;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,8 +8,8 @@ import java.util.List;
 
 public class Database extends SQLiteBase {
 
-    public Database(Configuration config) throws SQLException {
-        super(config.getString("database_path", "database.db"));
+    public Database(String path) throws SQLException {
+        super(path);
     }
 
     @Override
