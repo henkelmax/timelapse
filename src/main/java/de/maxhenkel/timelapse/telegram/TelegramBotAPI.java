@@ -35,7 +35,7 @@ public class TelegramBotAPI extends TelegramBotBase {
         String sdf = config.getString("telegram_date_format", "dd.MM.yyyy HH:mm:ss");
         simpleDateFormat = new SimpleDateFormat(sdf);
         database = new Database(config);
-        adminUserID = config.getInt("admin_user_id", 9181493);
+        adminUserID = config.getInt("admin_user_id", -1);
         maxMessageDelay = config.getLong("max_message_delay", 60000);
     }
 
@@ -180,7 +180,7 @@ public class TelegramBotAPI extends TelegramBotBase {
 
     private void remove(Message message, String[] args) {
         if (args.length <= 0) {
-            send(message.chat().id(), "Insufficient Argumente");
+            send(message.chat().id(), "Insufficient arguments");
             return;
         }
 

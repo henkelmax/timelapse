@@ -100,7 +100,7 @@ public class Main {
             }
             thread.stopTimelapse();
             try {
-                thread.join(10000);//Wait max 10 seconds for thread to stop
+                thread.join(10000); // Wait max 10 seconds for thread to stop
             } catch (InterruptedException e1) {
                 e1.printStackTrace();
             }
