@@ -20,45 +20,45 @@ public class Database extends SQLiteBase {
                 "CREATE TABLE IF NOT EXISTS blacklist (id INTEGER PRIMARY KEY NOT NULL, comment TEXT);");
     }
 
-    public boolean isWhitelisted(int userID) throws SQLException {
+    public boolean isWhitelisted(long userID) throws SQLException {
         ResultSet rs = getConnection().createStatement().executeQuery("SELECT id FROM whitelist WHERE id= " + userID + ";");
 
         return rs.next();
     }
 
-    public boolean isBlacklisted(int userID) throws SQLException {
+    public boolean isBlacklisted(long userID) throws SQLException {
         ResultSet rs = getConnection().createStatement().executeQuery("SELECT id FROM blacklist WHERE id= " + userID + ";");
 
         return rs.next();
     }
 
-    public void addToWhitelist(int id, String comment) throws SQLException {
+    public void addToWhitelist(long id, String comment) throws SQLException {
         getConnection().createStatement()
                 .execute("INSERT INTO whitelist (id, comment) VALUES (" + id + ", '" + comment + "');");
     }
 
-    public void addToBlacklist(int id, String comment) throws SQLException {
+    public void addToBlacklist(long id, String comment) throws SQLException {
         getConnection().createStatement()
                 .execute("INSERT INTO blacklist (id, comment) VALUES (" + id + ", '" + comment + "');");
     }
 
-    public void removeFromWhitelist(int id) throws SQLException {
+    public void removeFromWhitelist(long id) throws SQLException {
         getConnection().createStatement()
                 .execute("DELETE FROM whitelist WHERE id=" + id + ";");
     }
 
-    public void removeFromBlacklist(int id) throws SQLException {
+    public void removeFromBlacklist(long id) throws SQLException {
         getConnection().createStatement()
                 .execute("DELETE FROM blacklist WHERE id=" + id + ";");
     }
 
-    public Entry getWhitelistEntry(int id) throws SQLException {
+    public Entry getWhitelistEntry(long id) throws SQLException {
         ResultSet rs = getConnection().createStatement().executeQuery("SELECT * FROM whitelist WHERE id= " + id + ";");
 
         return get(rs, true);
     }
 
-    public Entry getBlacklistEntry(int id) throws SQLException {
+    public Entry getBlacklistEntry(long id) throws SQLException {
         ResultSet rs = getConnection().createStatement().executeQuery("SELECT * FROM blacklist WHERE id= " + id + ";");
 
         return get(rs, true);
@@ -106,7 +106,7 @@ public class Database extends SQLiteBase {
     }
 
     public static class Entry {
-        private int id;
+        private long id;
         private String comment;
 
         private Entry() {
@@ -117,7 +117,7 @@ public class Database extends SQLiteBase {
             return comment;
         }
 
-        public int getId() {
+        public long getId() {
             return id;
         }
     }

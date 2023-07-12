@@ -1,4 +1,4 @@
-# Timelapse ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/henkelmax/timelapse/Build) ![GitHub issues](https://img.shields.io/github/issues-raw/henkelmax/timelapse) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/henkelmax/timelapse) ![GitHub All Releases](https://img.shields.io/github/downloads/henkelmax/timelapse/total)
+# Timelapse
 
 A program that creates timelapses.
 
@@ -39,21 +39,21 @@ A program that creates timelapses.
 ## Examples
 
 ```
-java -jar timelapse-1.0.5.jar --frame true --telegram-bot
+java -jar timelapse.jar --frame true --telegram-bot
 ```
 This starts the Timelapse Bot with a preview window and without the Telegram Bot enabled
 
 ---
 
 ```
-java -jar timelapse-1.0.5.jar --convert --frame-rate 60
+java -jar timelapse.jar --convert --frame-rate 60
 ```
 This converts the captured images to a video with a frame rate of 60
 
 ---
 
 ```
-java -jar timelapse-1.0.5.jar --telegram-bot --save-images false --frame false
+java -jar timelapse.jar --telegram-bot --save-images false --frame false
 ```
 This enables the Telegram Bot but disables the image capturing function
 

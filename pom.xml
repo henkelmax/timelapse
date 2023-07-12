@@ -5,7 +5,7 @@
 
     <groupId>de.maxhenkel.timelapse</groupId>
     <artifactId>timelapse</artifactId>
-    <version>1.0.10</version>
+    <version>1.0.11</version>
 
     <dependencies>
         <dependency>
@@ -50,22 +50,22 @@
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
-            <version>2.13.3</version>
+            <version>2.20.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
-            <version>2.13.3</version>
+            <version>2.20.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
-            <version>1.7.30</version>
+            <version>2.0.7</version>
         </dependency>
         <dependency>
             <groupId>com.github.pengrad</groupId>
             <artifactId>java-telegram-bot-api</artifactId>
-            <version>4.9.0</version>
+            <version>6.7.0</version>
         </dependency>
         <dependency>
             <groupId>xuggle</groupId>
@@ -75,17 +75,17 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
-            <version>3.11</version>
+            <version>3.12.0</version>
         </dependency>
         <dependency>
             <groupId>commons-cli</groupId>
             <artifactId>commons-cli</artifactId>
-            <version>1.4</version>
+            <version>1.5.0</version>
         </dependency>
         <dependency>
-            <groupId>de.maxhenkel.simpleconfig</groupId>
-            <artifactId>simple-config</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <groupId>de.maxhenkel.configbuilder</groupId>
+            <artifactId>configbuilder</artifactId>
+            <version>1.1.3</version>
         </dependency>
     </dependencies>
 
@@ -104,7 +104,7 @@
         </repository>
         <repository>
             <id>openimaj Repository</id>
-            <url>http://maven.openimaj.org/</url>
+            <url>https://maven.openimaj.org/</url>
         </repository>
         <repository>
             <id>openimaj Snapshot Repository</id>
@@ -148,8 +148,8 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>8</source>
+                    <target>8</target>
                 </configuration>
             </plugin>
         </plugins>

@@ -1,7 +1,5 @@
 package de.maxhenkel.timelapse;
 
-import de.maxhenkel.simpleconfig.Configuration;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -12,14 +10,13 @@ public class TimelapseFrame extends JFrame implements TimelapseEngine.TimelapseL
     private ImageLabel imageLabel;
     private SimpleDateFormat simpleDateFormat;
 
-    public TimelapseFrame(Configuration config) {
+    public TimelapseFrame() {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        String sdf = config.getString("frame_date_format", "dd.MM.yyyy HH:mm:ss");
-        simpleDateFormat = new SimpleDateFormat(sdf);
+        simpleDateFormat = new SimpleDateFormat(Main.CONFIG.frameDateFormat.get());
 
         setTitle("Timelapse");
         setSize(800, 470);

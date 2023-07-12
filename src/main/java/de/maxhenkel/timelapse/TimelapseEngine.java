@@ -1,7 +1,6 @@
 package de.maxhenkel.timelapse;
 
 import com.github.sarxos.webcam.Webcam;
-import de.maxhenkel.simpleconfig.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,7 +12,10 @@ import javax.imageio.stream.ImageOutputStream;
 import javax.imageio.stream.MemoryCacheImageOutputStream;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -22,7 +24,6 @@ public class TimelapseEngine {
     private static final Logger LOGGER = LogManager.getLogger();
 
     private Webcam webcam;
-    private Configuration config;
     private long delay;
     private File outputFolder;
     private int width, height;
@@ -34,20 +35,18 @@ public class TimelapseEngine {
     private File lastImageFile;
     private boolean saveImages;
 
-    public TimelapseEngine(Configuration config, File outputFolder, boolean saveImages) {
+    public TimelapseEngine(File outputFolder, boolean saveImages) {
         this.saveImages = saveImages;
-        this.config = config;
         this.outputFolder = outputFolder;
-        String sdf = config.getString("file_date_format", "yyyy-MM-dd-HH-mm-ss");
-        this.simpleDateFormat = new SimpleDateFormat(sdf);
-        this.width = config.getInt("image_width", 1920);
-        this.height = config.getInt("image_height", 1080);
-        this.compression = config.getFloat("compression", 1.0F);
-        setWebcam(Webcam.getWebcamByName(config.getString("webcam", "")));
+        this.simpleDateFormat = new SimpleDateFormat(Main.CONFIG.fileDateFormat.get());
+        this.width = Main.CONFIG.imageWidth.get();
+        this.height = Main.CONFIG.imageHeight.get();
+        this.compression = Main.CONFIG.compression.get().floatValue();
+        setWebcam(Webcam.getWebcamByName(Main.CONFIG.webcam.get()));
         if (webcam == null) {
             setWebcam(Webcam.getDefault());
         }
-        delay = config.getLong("delay", 60000);
+        delay = Main.CONFIG.delay.get();
     }
 
     public void setTimelapseListener(TimelapseListener listener) {
@@ -98,8 +97,8 @@ public class TimelapseEngine {
     public void setResolution(int width, int height) {
         this.width = width;
         this.height = height;
-        config.put("image_width", width);
-        config.put("image_height", height);
+        Main.CONFIG.imageWidth.set(width).save();
+        Main.CONFIG.imageHeight.set(height).save();
 
         if (webcam != null) {
             webcam.setCustomViewSizes(new Dimension[]{new Dimension(width, height)});
@@ -125,7 +124,7 @@ public class TimelapseEngine {
 
     public void setCompression(float compression) {
         this.compression = compression;
-        config.put("compression", compression);
+        Main.CONFIG.compression.set((double) compression).save();
     }
 
     public long getDelay() {
@@ -134,7 +133,7 @@ public class TimelapseEngine {
 
     public void setDelay(long delay) {
         this.delay = delay;
-        config.put("delay", delay);
+        Main.CONFIG.delay.set(delay).save();
     }
 
     public List<Webcam> getWebcams() {
@@ -153,9 +152,8 @@ public class TimelapseEngine {
         if (webcam == null) {
             return;
         }
-        config.put("webcam", webcam.getName());
+        Main.CONFIG.webcam.set(webcam.getName()).save();
         setResolution(width, height);
-
     }
 
     public void takePicture() throws IOException {

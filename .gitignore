@@ -5,5 +5,5 @@ target
 .settings
 .classpath
 .project
-config.properties
+*.properties
 *.db

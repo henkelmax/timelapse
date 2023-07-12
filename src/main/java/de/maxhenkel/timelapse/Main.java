@@ -2,8 +2,7 @@ package de.maxhenkel.timelapse;
 
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.ds.v4l4j.V4l4jDriver;
-import de.maxhenkel.simpleconfig.Configuration;
-import de.maxhenkel.simpleconfig.PropertyConfiguration;
+import de.maxhenkel.configbuilder.ConfigBuilder;
 import de.maxhenkel.timelapse.telegram.TelegramBotAPI;
 import org.apache.commons.cli.*;
 import org.apache.commons.lang3.SystemUtils;
@@ -14,6 +13,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -21,6 +21,7 @@ import java.util.Calendar;
 public class Main {
 
     private static final Logger LOGGER = LogManager.getLogger();
+    public static Config CONFIG;
 
     public static void main(String[] args) throws IOException, SQLException, ParseException {
         if (SystemUtils.IS_OS_LINUX) {
@@ -56,7 +57,7 @@ public class Main {
             return;
         }
 
-        Configuration config = new PropertyConfiguration(new File(cmd.getOptionValue("c", "config.properties")));
+        CONFIG = ConfigBuilder.build(Paths.get(cmd.getOptionValue("c", "config.properties")).toAbsolutePath(), Config::new);
 
         File outputFolder = new File(cmd.getOptionValue("o", "timelapse"));
 
@@ -68,19 +69,19 @@ public class Main {
             return;
         }
 
-        TimelapseEngine timelapseEngine = new TimelapseEngine(config, outputFolder, Boolean.parseBoolean(cmd.getOptionValue("s", String.valueOf(true))));
+        TimelapseEngine timelapseEngine = new TimelapseEngine(outputFolder, Boolean.parseBoolean(cmd.getOptionValue("s", String.valueOf(true))));
 
         timelapseEngine.printInfo();
 
         TimelapseThread thread = new TimelapseThread(timelapseEngine);
 
         if (cmd.hasOption("t")) {
-            new TelegramBotAPI(config, timelapseEngine, cmd.getOptionValue("D", "database.db"), cmd.hasOption("p"));
+            new TelegramBotAPI(timelapseEngine, cmd.getOptionValue("D", "database.db"), cmd.hasOption("p"));
         }
 
         TimelapseFrame frame;
         if (Boolean.parseBoolean(cmd.getOptionValue("F", String.valueOf(true)))) {
-            frame = new TimelapseFrame(config);
+            frame = new TimelapseFrame();
             frame.setVisible(true);
             timelapseEngine.setTimelapseListener(frame);
         }

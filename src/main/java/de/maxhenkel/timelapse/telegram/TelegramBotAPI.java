@@ -14,7 +14,6 @@ import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendPhoto;
 import com.pengrad.telegrambot.response.GetChatResponse;
 import com.pengrad.telegrambot.response.SendResponse;
-import de.maxhenkel.simpleconfig.Configuration;
 import de.maxhenkel.timelapse.Database;
 import de.maxhenkel.timelapse.Main;
 import de.maxhenkel.timelapse.TimelapseEngine;
@@ -33,19 +32,18 @@ public class TelegramBotAPI extends TelegramBotBase {
     private final TimelapseEngine timelapseEngine;
     private final SimpleDateFormat simpleDateFormat;
     private final Database database;
-    private final int adminUserID;
+    private final long adminUserID;
     private final long maxMessageDelay;
     private boolean privateMode;
 
-    public TelegramBotAPI(Configuration config, TimelapseEngine timelapseEngine, String databasePath, boolean privateMode) throws SQLException {
-        super(config.getString("api_token", ""));
+    public TelegramBotAPI(TimelapseEngine timelapseEngine, String databasePath, boolean privateMode) throws SQLException {
+        super(Main.CONFIG.apiToken.get());
         this.timelapseEngine = timelapseEngine;
         this.privateMode = privateMode;
-        String sdf = config.getString("telegram_date_format", "dd.MM.yyyy HH:mm:ss");
-        simpleDateFormat = new SimpleDateFormat(sdf);
+        simpleDateFormat = new SimpleDateFormat(Main.CONFIG.telegramDateFormat.get());
         database = new Database(databasePath);
-        adminUserID = config.getInt("admin_user_id", -1);
-        maxMessageDelay = config.getLong("max_message_delay", 60000);
+        adminUserID = Main.CONFIG.adminUserId.get();
+        maxMessageDelay = Main.CONFIG.maxMessageDelay.get();
     }
 
     @Override
@@ -108,7 +106,7 @@ public class TelegramBotAPI extends TelegramBotBase {
     }
 
     private void parseCallback(String uid, long senderChatID) throws SQLException {
-        int userID = Integer.parseInt(uid.substring(1));
+        long userID = Long.parseLong(uid.substring(1));
 
         if (uid.startsWith("w")) {
             if (database.isWhitelisted(userID)) {
@@ -163,7 +161,7 @@ public class TelegramBotAPI extends TelegramBotBase {
         }
     }
 
-    private void addToDatabase(int userID, long senderID, String comment, boolean whitelist) {
+    private void addToDatabase(long userID, long senderID, String comment, boolean whitelist) {
         try {
             String listname = whitelist ? "whitelist" : "blacklist";
 
@@ -310,10 +308,8 @@ public class TelegramBotAPI extends TelegramBotBase {
 
     private void sendAdminWhitelistRequest(User user) {
         InlineKeyboardMarkup inlineKeyboard = new InlineKeyboardMarkup(
-                new InlineKeyboardButton[]{
-                        new InlineKeyboardButton("Whitelist").callbackData("w" + user.id()),
-                        new InlineKeyboardButton("Blacklist").callbackData("b" + user.id())
-                });
+                new InlineKeyboardButton("Whitelist").callbackData("w" + user.id()),
+                new InlineKeyboardButton("Blacklist").callbackData("b" + user.id()));
 
         String message = ("Request by '" + user.username() + "' userid '" + user.id() + "'");
 
@@ -348,7 +344,7 @@ public class TelegramBotAPI extends TelegramBotBase {
         if (user == null) {
             return false;
         }
-        return user.id().intValue() == adminUserID;
+        return user.id() == adminUserID;
     }
 
     private boolean isAdmin(Message message) {
