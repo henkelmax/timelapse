@@ -114,3 +114,9 @@ sudo apt-get update
 
 sudo apt-get install oracle-java8-jdk
 ```
+
+[libjpeg](https://raspberrypi.stackexchange.com/a/76833)
+
+``` sh
+sudo apt install libjpeg8
+```
